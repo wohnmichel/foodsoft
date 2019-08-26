@@ -13,10 +13,9 @@
   %tbody.list
     - order.articles_grouped_by_category.each do |category_name, order_articles|
       %tr.list-heading.article-category
-        %td
+        %td{:colspan => "10"}
           = category_name
           %i.icon-tag
-        %td{:colspan => "9"}
       - order_articles.each do |order_article|
         - net_price = order_article.price.price
         - gross_price = order_article.price.gross_price

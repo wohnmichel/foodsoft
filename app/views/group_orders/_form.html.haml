@@ -89,10 +89,9 @@
     %tbody.list
       - @order.articles_grouped_by_category.each do |category, order_articles|
         %tr.list-heading.article-category
-          %td
+          %td{colspan: "10"}
             = category
             %i.icon-tag
-          %td{colspan: "9"}
         - order_articles.each do |order_article|
           %tr{class: "#{cycle('even', 'odd', name: 'articles')} order-article #{get_missing_units_css_class(@ordering_data[:order_articles][order_article.id][:missing_units])}", valign: "top"}
             %td.name= order_article.article.name
