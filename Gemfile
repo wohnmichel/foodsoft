@@ -42,7 +42,6 @@ gem 'rails-settings-cached', '= 0.4.3' # caching breaks tests until Rails 5 http
 gem 'resque'
 gem 'thin'
 gem 'whenever', require: false # For defining cronjobs, see config/schedule.rb
-gem 'protected_attributes', '= 1.1.0' # 1.1.0 until tests work work with higher versions
 gem 'ruby-units'
 gem 'attribute_normalizer'
 gem 'ice_cube'
@@ -70,7 +69,7 @@ gem 'foodsoft_discourse', path: 'plugins/discourse'
 
 
 group :development do
-  gem 'sqlite3'
+  gem 'sqlite3', '~> 1.3.6'
   gem 'mailcatcher'
   gem 'web-console', '~> 2.0'
 
@@ -83,9 +82,6 @@ group :development do
 
   # Get infos when not using proper eager loading
   gem 'bullet'
-
-  # Hide assets requests in log
-  gem 'quiet_assets'
 end
 
 group :development, :test do
@@ -101,7 +97,8 @@ group :test do
   gem 'factory_bot_rails'
   gem 'faker'
   gem 'capybara'
-  gem 'capybara-webkit'
+  gem 'puma' # for faster Capybara tests
+  gem 'apparition' # Capybara javascript driver
   gem 'database_cleaner'
   gem 'connection_pool'
   # need to include rspec components before i18n-spec or rake fails in test environment

@@ -125,6 +125,7 @@ Foodsoft::Application.routes.draw do
       end
 
       resources :articles do
+        get :copy
         collection do
           post :update_selected
           get :edit_all
@@ -194,6 +195,7 @@ Foodsoft::Application.routes.draw do
 
       resources :bank_accounts, only: [:index] do
         member do
+          get :assign_unlinked_transactions
           get :import
         end
 

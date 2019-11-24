@@ -1,6 +1,6 @@
 # encoding: utf-8
 class ArticlesController < ApplicationController
-  before_filter :authenticate_article_meta, :find_supplier
+  before_action :authenticate_article_meta, :find_supplier
 
   def index
     if params['sort']
@@ -33,6 +33,11 @@ class ArticlesController < ApplicationController
 
   def new
     @article = @supplier.articles.build(:tax => FoodsoftConfig[:tax_default])
+    render :layout => false
+  end
+
+  def copy
+    @article = @supplier.articles.find(params[:article_id]).dup
     render :layout => false
   end
 
