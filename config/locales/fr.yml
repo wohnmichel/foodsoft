@@ -897,9 +897,8 @@ fr:
         CherEs %{ordergroup},
 
         La commande pour "%{order}" a été finalisée le %{when} par %{user}.
-      text2: |
         Voilà la liste des produits qui ont été commandés pour vous:
-      text3: |-
+      text1: |-
         Prix total: %{sum}
         Afficher sur le site: %{order_url}
 

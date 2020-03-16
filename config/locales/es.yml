@@ -1056,9 +1056,8 @@ es:
         Queridos miebros de %{ordergroup},
 
         El pedido de "%{order}" ha sido cerrado por %{user} en %{when}.
-      text2: |
         Los siguientes artículos se han pedido para tu grupo de pedido:
-      text3: |-
+      text1: |-
         o Suma total: %{sum}
 
         Puedes ver el pedido online: %{order_url}

@@ -536,13 +536,6 @@ en:
       text_1: 'Here you can upload a spreadsheet to update the articles of %{supplier}. Excel (xls, xlsx) and OpenOffice (ods) spreadsheets are accepted, as well as comma-separated files (csv, columns separated by ";" with utf-8 encoding). Only the first sheet will be imported, and columns must be in the following order:'
       text_2: The rows shown here are examples. When there is an "x" in the first column, the article is outlisted and will be removed. This allows you to edit the spreadsheet and quickly remove many articles at once, for example when articles become unavailable with the supplier. The category will be matched to your Foodsoft category list (both by category name and import names).
       title: Upload articles of %{supplier}
-  bank_account_connector:
-    confirm_app: Please confirum the code %{code} in your app.
-    fields:
-      email: E-Mail
-      pin: PIN
-      password: Password
-      username: Username
   config:
     hints:
       applepear_url: Website where the apple and pear system for tasks is explained.
@@ -737,8 +730,6 @@ en:
       close:
         alert: 'An error occured while accounting: %{message}'
         notice: Order was settled succesfully, the balance of the account was updated.
-      close_all_direct_with_invoice:
-        notice: '%{count} orders have been settled.'
       close_direct:
         alert: 'Order can not be settled: %{message}'
         notice: Order was settled.
@@ -760,7 +751,6 @@ en:
         total_fc: Sum (FC-price)
         units: Units
       index:
-        close_all_direct_with_invoice: Close all with invoice
         title: Closed orders
       invoice:
         edit: Edit invoice
@@ -816,8 +806,6 @@ en:
       import:
         notice: '%{count} new transactions have been imported'
         no_import_method: For this bank account no import method is configured.
-        submit: Abschicken
-        title: Import bank transactions for %{name}
       index:
         title: Bank Accounts
     bank_transactions:
@@ -1237,11 +1225,8 @@ en:
         Dear %{ordergroup},
 
         The order for "%{order}" has been closed by %{user} on %{when}.
-      text1: |
-        It can be presumable be picked up on %{pickup}.
-      text2: |
         The following articles have been ordered for your ordergroup:
-      text3: |-
+      text1: |-
         o Total sum: %{sum}
 
         You can view the order online: %{order_url}

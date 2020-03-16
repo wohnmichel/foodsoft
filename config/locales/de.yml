@@ -516,13 +516,6 @@ de:
       text_1: 'Du kannst hier eine Tabelle hochladen, um die Artikel des Lieferanten %{supplier} zu aktualisieren. Excel (xls, xlsx) und OpenOffice (ods) Tabellen werden akzeptiert, darüber hinaus Dateien im Format "csv" (comma-separated values, mit dem Spaltentrennzeichen ";" und utf-8 Kodierung). Nur das erste Tabellenblatt wird importiert und die Spalten müssen in der folgenden Anordnung vorliegen:'
       text_2: Die hier gezeigten Spalten sind Beispiele. Ist ein "x" in der ersten Spalte, wird der Artikel aussortiert und entfernt. Das erlaubt Dir die Tabelle zu ändern und schnell viele Artikel auf ein Mal zu entfernen, zum Beispiel wenn Artkiel des Lieferanten nicht mehr verfügbar sind. Die Kategorie wird der Foodsoft Kategorie zugeordnet (durch die Kategorienamen und die Importnamen).
       title: Artikel des Lieferanten %{supplier} hochladen
-  bank_account_connector:
-    confirm_app: Bitte bestätige den Code %{code} in deiner App.
-    fields:
-      email: E-Mail
-      pin: PIN
-      password: Passwort
-      username: Benutzername
   config:
     hints:
       applepear_url: Seite, auf der das Äpfel- und Birnensystem für Aufgaben erklärt wird.
@@ -712,8 +705,6 @@ de:
       close:
         alert: 'Ein Fehler ist beim Abrechnen aufgetreten: %{message}'
         notice: Bestellung wurde erfolgreich abgerechnet, die Kontostände aktualisiert.
-      close_all_direct_with_invoice:
-        notice: Es wurden %{count} Bestellung abgerechnet.
       close_direct:
         alert: 'Bestellung kann nicht abgerechnet werden: %{message}'
         notice: Bestellung wurde abgerechnet.
@@ -735,7 +726,6 @@ de:
         total_fc: Summe (FC-Preis)
         units: Einheiten
       index:
-        close_all_direct_with_invoice: Alle mit Rechnung abrechnen
         title: Beendete Bestellungen
       invoice:
         edit: Rechnung bearbeiten
@@ -791,8 +781,6 @@ de:
       import:
         notice: 'Es wurden %{count} neue Transaktionen importiert.'
         no_import_method: Für dieses Bankkonto ist keine Importmethode konfiguriert.
-        submit: Abschicken
-        title: Banktransaktionen für %{name} importieren
       index:
         title: Bankkonten
     bank_transactions:
@@ -1195,11 +1183,8 @@ de:
         Liebe Bestellgruppe %{ordergroup},
 
         die Bestellung für "%{order}" wurde am %{when} von %{user} beendet.
-      text1: |
-        Sie kann voraussichtlich am %{pickup} abgeholt werden.
-      text2: |
         Für euch wurden die folgenden Artikel bestellt:
-      text3: |-
+      text1: |-
         o Gesamtpreis: %{sum}
 
         Bestellung online einsehen: %{order_url}

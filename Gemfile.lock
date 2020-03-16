@@ -37,13 +37,6 @@ PATH
       rails
 
 PATH
-  remote: plugins/polls
-  specs:
-    foodsoft_polls (0.0.1)
-      deface (~> 1.0)
-      rails
-
-PATH
   remote: plugins/wiki
   specs:
     foodsoft_wiki (0.0.1)
@@ -283,7 +276,7 @@ GEM
     multi_json (1.14.1)
     mysql2 (0.4.10)
     nio4r (2.5.2)
-    nokogiri (1.10.8)
+    nokogiri (1.10.4)
       mini_portile2 (~> 2.4.0)
     pdf-core (0.7.0)
     polyglot (0.3.5)
@@ -302,9 +295,9 @@ GEM
       binding_of_caller (>= 0.7)
       pry (>= 0.9.11)
     public_suffix (4.0.1)
-    puma (4.3.3)
+    puma (4.2.1)
       nio4r (~> 2.0)
-    rack (1.6.12)
+    rack (1.6.11)
     rack-contrib (1.8.0)
       rack (~> 1.4)
     rack-cors (1.0.6)
@@ -535,7 +528,6 @@ DEPENDENCIES
   foodsoft_discourse!
   foodsoft_documents!
   foodsoft_messages!
-  foodsoft_polls!
   foodsoft_wiki!
   gaffe
   haml (~> 4.0)

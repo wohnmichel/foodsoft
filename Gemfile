@@ -61,7 +61,6 @@ gem 'foodsoft_wiki', path: 'plugins/wiki'
 gem 'foodsoft_messages', path: 'plugins/messages'
 gem 'foodsoft_documents', path: 'plugins/documents'
 gem 'foodsoft_discourse', path: 'plugins/discourse'
-gem 'foodsoft_polls', path: 'plugins/polls'
 
 # plugins not enabled by default
 #gem 'foodsoft_current_orders', path: 'plugins/current_orders'
