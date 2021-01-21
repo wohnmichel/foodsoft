@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181201000200) do
+ActiveRecord::Schema.define(version: 20181205010000) do
 
   create_table "article_categories", force: :cascade do |t|
     t.string "name",        limit: 255, default: "", null: false
@@ -21,7 +21,7 @@ ActiveRecord::Schema.define(version: 20181201000200) do
   add_index "article_categories", ["name"], name: "index_article_categories_on_name", unique: true, using: :btree
 
   create_table "article_prices", force: :cascade do |t|
-    t.integer  "article_id",    limit: 4
+    t.integer  "article_id",    limit: 4,                                     null: false
     t.decimal  "price",                   precision: 8, scale: 2, default: 0, null: false
     t.decimal  "tax",                     precision: 8, scale: 2, default: 0, null: false
     t.decimal  "deposit",                 precision: 8, scale: 2, default: 0, null: false
@@ -90,16 +90,6 @@ ActiveRecord::Schema.define(version: 20181201000200) do
 
   add_index "bank_transactions", ["financial_link_id"], name: "index_bank_transactions_on_financial_link_id", using: :btree
 
-  create_table "deliveries", force: :cascade do |t|
-    t.integer  "supplier_id",  limit: 4
-    t.date     "delivered_on"
-    t.datetime "created_at"
-    t.text     "note",         limit: 65535
-    t.integer  "invoice_id",   limit: 4
-  end
-
-  add_index "deliveries", ["supplier_id"], name: "index_deliveries_on_supplier_id", using: :btree
-
   create_table "documents", force: :cascade do |t|
     t.string   "name",               limit: 255
     t.string   "mime",               limit: 255
@@ -124,12 +114,13 @@ ActiveRecord::Schema.define(version: 20181201000200) do
     t.string  "name",                           limit: 255, null: false
     t.integer "financial_transaction_class_id", limit: 4,   null: false
     t.string  "name_short",                     limit: 255
+    t.integer "bank_account_id",                limit: 4
   end
 
   add_index "financial_transaction_types", ["name_short"], name: "index_financial_transaction_types_on_name_short", using: :btree
 
   create_table "financial_transactions", force: :cascade do |t|
-    t.integer  "ordergroup_id",                 limit: 4,                             default: 0, null: false
+    t.integer  "ordergroup_id",                 limit: 4
     t.decimal  "amount",                                      precision: 8, scale: 2, default: 0, null: false
     t.text     "note",                          limit: 65535,                                     null: false
     t.integer  "user_id",                       limit: 4,                             default: 0, null: false
@@ -137,6 +128,7 @@ ActiveRecord::Schema.define(version: 20181201000200) do
     t.integer  "financial_transaction_type_id", limit: 4,                                         null: false
     t.integer  "financial_link_id",             limit: 4
     t.integer  "reverts_id",                    limit: 4
+    t.integer  "group_order_id"
   end
 
   add_index "financial_transactions", ["ordergroup_id"], name: "index_financial_transactions_on_ordergroup_id", using: :btree
@@ -172,6 +164,7 @@ ActiveRecord::Schema.define(version: 20181201000200) do
     t.integer  "lock_version",       limit: 4,                         default: 0, null: false
     t.datetime "updated_on",                                                       null: false
     t.integer  "updated_by_user_id", limit: 4
+    t.decimal  "transport",                    precision: 8, scale: 2
   end
 
   add_index "group_orders", ["order_id"], name: "index_group_orders_on_order_id", using: :btree
@@ -232,6 +225,14 @@ ActiveRecord::Schema.define(version: 20181201000200) do
   end
 
   add_index "invoices", ["supplier_id"], name: "index_invoices_on_supplier_id", using: :btree
+
+  create_table "links", force: :cascade do |t|
+    t.string  "name",                          null: false
+    t.string  "url",                           null: false
+    t.integer "workgroup_id"
+    t.boolean "indirect",      default: false, null: false
+    t.string  "authorization"
+  end
 
   create_table "mail_delivery_status", force: :cascade do |t|
     t.datetime "created_at"
@@ -352,6 +353,7 @@ ActiveRecord::Schema.define(version: 20181201000200) do
     t.date     "pickup"
     t.datetime "last_sent_mail"
     t.integer  "end_action",         limit: 4,                             default: 0,      null: false
+    t.decimal  "transport",                        precision: 8, scale: 2
   end
 
   add_index "orders", ["state"], name: "index_orders_on_state", using: :btree
@@ -418,7 +420,7 @@ ActiveRecord::Schema.define(version: 20181201000200) do
     t.text     "required_ordergroup_custom_fields", limit: 65535
     t.text     "required_user_custom_fields",       limit: 65535
     t.integer  "voting_method",                     limit: 4,                     null: false
-    t.string   "choices",                           limit: 255,                   null: false
+    t.text     "choices",                           limit: 65535,                 null: false
     t.integer  "final_choice",                      limit: 4
     t.integer  "multi_select_count",                limit: 4,     default: 0,     null: false
     t.integer  "min_points",                        limit: 4
@@ -460,57 +462,68 @@ ActiveRecord::Schema.define(version: 20181201000200) do
   add_index "settings", ["thing_type", "thing_id", "var"], name: "index_settings_on_thing_type_and_thing_id_and_var", unique: true, using: :btree
 
   create_table "stock_changes", force: :cascade do |t|
-    t.integer  "delivery_id",      limit: 4
+    t.integer  "stock_event_id",   limit: 4
     t.integer  "order_id",         limit: 4
     t.integer  "stock_article_id", limit: 4
     t.integer  "quantity",         limit: 4, default: 0
     t.datetime "created_at"
-    t.integer  "stock_taking_id",  limit: 4
   end
 
-  add_index "stock_changes", ["delivery_id"], name: "index_stock_changes_on_delivery_id", using: :btree
   add_index "stock_changes", ["stock_article_id"], name: "index_stock_changes_on_stock_article_id", using: :btree
-  add_index "stock_changes", ["stock_taking_id"], name: "index_stock_changes_on_stock_taking_id", using: :btree
+  add_index "stock_changes", ["stock_event_id"], name: "index_stock_changes_on_stock_event_id", using: :btree
 
-  create_table "stock_takings", force: :cascade do |t|
+  create_table "stock_events", force: :cascade do |t|
+    t.integer  "supplier_id", limit: 4
     t.date     "date"
-    t.text     "note",       limit: 65535
     t.datetime "created_at"
+    t.text     "note",        limit: 65535
+    t.integer  "invoice_id",  limit: 4
+    t.string   "type",                      null: false
+  end
+
+  add_index "stock_events", ["supplier_id"], name: "index_stock_events_on_supplier_id", using: :btree
+
+  create_table "supplier_categories", force: :cascade do |t|
+    t.string  "name",                           limit: 255, null: false
+    t.string  "description",                    limit: 255
+    t.integer "financial_transaction_class_id", limit: 4
   end
 
   create_table "suppliers", force: :cascade do |t|
-    t.string   "name",               limit: 255, default: "", null: false
-    t.string   "address",            limit: 255, default: "", null: false
-    t.string   "phone",              limit: 255, default: "", null: false
-    t.string   "phone2",             limit: 255
-    t.string   "fax",                limit: 255
-    t.string   "email",              limit: 255
-    t.string   "url",                limit: 255
-    t.string   "contact_person",     limit: 255
-    t.string   "customer_number",    limit: 255
-    t.string   "delivery_days",      limit: 255
-    t.string   "order_howto",        limit: 255
-    t.string   "note",               limit: 255
-    t.integer  "shared_supplier_id", limit: 4
-    t.string   "min_order_quantity", limit: 255
+    t.string   "name",                 limit: 255, default: "", null: false
+    t.string   "address",              limit: 255, default: "", null: false
+    t.string   "phone",                limit: 255, default: "", null: false
+    t.string   "phone2",               limit: 255
+    t.string   "fax",                  limit: 255
+    t.string   "email",                limit: 255
+    t.string   "url",                  limit: 255
+    t.string   "contact_person",       limit: 255
+    t.string   "customer_number",      limit: 255
+    t.string   "delivery_days",        limit: 255
+    t.string   "order_howto",          limit: 255
+    t.string   "note",                 limit: 255
+    t.integer  "shared_supplier_id",   limit: 4
+    t.string   "min_order_quantity",   limit: 255
     t.datetime "deleted_at"
-    t.string   "shared_sync_method", limit: 255
-    t.string   "iban",               limit: 255
+    t.string   "shared_sync_method",   limit: 255
+    t.string   "iban",                 limit: 255
+    t.integer  "supplier_category_id", limit: 4
   end
 
   add_index "suppliers", ["name"], name: "index_suppliers_on_name", unique: true, using: :btree
 
   create_table "tasks", force: :cascade do |t|
-    t.string   "name",                   limit: 255, default: "",    null: false
-    t.string   "description",            limit: 255
+    t.string   "name",                   limit: 255,   default: "",    null: false
+    t.text     "description",            limit: 65535
     t.date     "due_date"
-    t.boolean  "done",                               default: false
+    t.boolean  "done",                                 default: false
     t.integer  "workgroup_id",           limit: 4
-    t.datetime "created_on",                                         null: false
-    t.datetime "updated_on",                                         null: false
-    t.integer  "required_users",         limit: 4,   default: 1
-    t.integer  "duration",               limit: 4,   default: 1
+    t.datetime "created_on",                                           null: false
+    t.datetime "updated_on",                                           null: false
+    t.integer  "required_users",         limit: 4,     default: 1
+    t.integer  "duration",               limit: 4,     default: 1
     t.integer  "periodic_task_group_id", limit: 4
+    t.integer  "created_by_user_id",     limit: 4
   end
 
   add_index "tasks", ["due_date"], name: "index_tasks_on_due_date", using: :btree

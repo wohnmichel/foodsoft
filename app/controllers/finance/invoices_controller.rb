@@ -1,4 +1,5 @@
 class Finance::InvoicesController < ApplicationController
+  before_action :authenticate_finance_or_invoices
 
   before_action :find_invoice, only: [:show, :edit, :update, :destroy]
   before_action :ensure_can_edit, only: [:edit, :update, :destroy]
@@ -31,7 +32,7 @@ class Finance::InvoicesController < ApplicationController
   end
 
   def fill_deliveries_and_orders_collection(invoice_id, supplier_id)
-    @deliveries_collection = Delivery.where('invoice_id = ? OR (invoice_id IS NULL AND supplier_id = ?)', invoice_id, supplier_id).order(:delivered_on)
+    @deliveries_collection = Delivery.where('invoice_id = ? OR (invoice_id IS NULL AND supplier_id = ?)', invoice_id, supplier_id).order(:date)
     @orders_collection = Order.where('invoice_id = ? OR (invoice_id IS NULL AND supplier_id = ? AND state = ?)', invoice_id, supplier_id, 'finished').order(:ends)
   end
 

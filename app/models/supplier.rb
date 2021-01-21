@@ -8,7 +8,8 @@ class Supplier < ApplicationRecord
   has_many :orders
   has_many :deliveries
   has_many :invoices
-  belongs_to :shared_supplier  # for the sharedLists-App
+  belongs_to :supplier_category
+  belongs_to :shared_supplier, optional: true  # for the sharedLists-App
 
   validates :name, :presence => true, :length => { :in => 4..30 }
   validates :phone, :presence => true, :length => { :in => 8..25 }
@@ -117,6 +118,7 @@ class Supplier < ApplicationRecord
   def mark_as_deleted
     transaction do
       super
+      update_column :iban, nil
       articles.each(&:mark_as_deleted)
     end
   end

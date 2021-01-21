@@ -33,8 +33,21 @@ nl:
         price: Netto prijs
         tax: BTW
         unit_quantity: Colligrootte
+      bank_account:
+        balance: Tegoed
+        description: Omschrijving
+        iban: IBAN
+        name: Naam
+      bank_transaction:
+        amount: Bedrag
+        date: Datum
+        external_id: Extern ID
+        financial_link: Financiële link
+        iban: IBAN
+        reference: Referentie
+        text: Omschrijving
       delivery:
-        delivered_on: Leverdatum
+        date: Leverdatum
         note: Notitie
         supplier: Leverancier
       document:
@@ -54,6 +67,7 @@ nl:
       financial_transaction_class:
         name: Naam
       financial_transaction_type:
+        bank_account: Bankrekening
         name: Naam
         financial_transaction_class: Financiële transactie klasse
         name_short: Verkorte naam
@@ -79,6 +93,7 @@ nl:
         deliveries: Levering
         deposit: Statiegeld in rekening gebracht
         deposit_credit: Statiegeld teruggekregen
+        financial_link: Financiële link
         net_amount: Bedrag gecorrigeerd voor statiegeld
         note: Notitie
         number: Nummer
@@ -106,6 +121,13 @@ nl:
         starts: Start op
         status: Status
         supplier: Leverancier
+        transport: Vervoerskosten
+        transport_distribution: Verdeling van vervoerskosten
+        transport_distributions:
+          articles: Verdeel de kosten over het aantal ontvangen artikelen
+          ordergroup: Ieder huishouden betaald hetzelfde bedrag
+          price: Verdeel de kosten over het orderbedrag
+          skip: Verdeel de kosten niet
         updated_by: Laatst aangepast door
       order_article:
         article: Artikel
@@ -165,6 +187,8 @@ nl:
         shared_sync_method: Hoe synchroniseren
         url: Homepage
       task:
+        created_by: Gemaakt door
+        created_on: Gemaakt op
         description: Beschrijving
         done: Gedaan?
         due_date: Voor wanneer?
@@ -271,6 +295,9 @@ nl:
         emails_title: Emailinstellingen
       tab_payment:
         schedule_title: Bestelrooster
+      tab_security:
+        default_roles_title: Toegang tot
+        default_roles_paragraph: Ieder lid van de foodcoop heeft standaard toegang tot de volgende onderdelen.
       tab_tasks:
         periodic_title: Periodieke taken
       tabs:
@@ -280,8 +307,12 @@ nl:
     confirm: Weet je het zeker?
     finances:
       index:
+        bank_accounts: Bankrekeningen
+        first_paragraph: Hier kunt u de financiële transactieklassen en de bijbehorende financiële transactietypes beheren. Elke financiële transactie heeft een type, die je bij elke transactie moet selecteren, als je meer dan één type hebt gemaakt. De financiële transactieklassen kunnen worden gebruikt om de financiële transactietypes te groeperen en zullen worden weergegeven als extra kolommen in het rekeningoverzicht, als er meer dan één is gecreëerd.
+        new_bank_account: Nieuwe bankrekening toevoegen
         new_financial_transaction_class: Nieuwe financiële transactie klasse toevoegen
         title: Financiën
+        transaction_types: Financiële transactie typen
       transaction_types:
         name: Naam
         new_financial_transaction_type: Nieuw financiëel transactie type toevoegen
@@ -291,6 +322,7 @@ nl:
         title_new: Nieuw financiëel transactie type toevoegen
     financial_transaction_types:
       form:
+        name_short_desc: De korte naam is verplicht voor financiële transactietypes die automatisch moeten kunnen worden toegewezen bij banktransacties. Als er meerdere bankrekeningen zijn, kan de voorkeursrekening voor bankoverschrijvingen worden geselecteerd.
         title_edit: Financiëel transactie type bewerken
         title_new: Nieuw financiëel transactie type toevoegen
     mail_delivery_status:
@@ -330,6 +362,9 @@ nl:
         notice: Gebruiker is verwijderd
       edit:
         title: Lid bewerken
+      form:
+        create_ordergroup: Maak een huishouden met dezelfde naam en voeg een gebruiker toe.
+        send_welcome_mail: Verstuur een welkomstmail naar de gebruiker.
       index:
         first_paragraph: Hier kun je gebruikers %{url}, bewerken en wissen.
         new_user: Nieuwe gebruiker
@@ -449,6 +484,7 @@ nl:
       not_found: Geen artikelen gevonden
     index:
       change_supplier: Leverancier wisselen ...
+      download: Artikelen downloaden
       edit_all: Alles bewerken
       ext_db:
         import: Zoeken/importeren
@@ -515,6 +551,14 @@ nl:
       text_1: 'Hier kun je een spreadsheet uploaden om de artikelen van %{supplier} bij te werken. Zowel Excel (xls, xlsx) als OpenOffice (ods) spreadsheets worden gelezen, evenals csv-bestanden (kolommen geschieden door ";", utf-8 encoding). Alleen de eerste sheet wordt geïmporteerd, en kolommen worden verwacht in deze volgorde:'
       text_2: De rijen hier getoond zijn voorbeelden. Een "x" in de eerste kolom geeft aan dat het artikel niet meer beschikbaar is en zal worden verwijderd. Hiermee kun je snel meerdere artikelen tegelijk verwijderen. De categorie wordt gematched met de Foodsoft categorielijst (zowel met de categorienaam als de bijbehorende importnamen).
       title: Artikelen uploaden voor %{supplier}
+  bank_account_connector:
+    confirm: Bevestig de code %{code}.
+    fields:
+      email: E-Mail
+      pin: PIN
+      password: Wachtwoord
+      tan: TAN
+      username: Gebruikersnaam
   config:
     hints:
       applepear_url: Website waar het appelpunten systeem wordt uitgelegd.
@@ -572,6 +616,12 @@ nl:
       currency_unit: Valuta
       custom_css: Aangepaste CSS
       default_locale: Standaardtaal
+      default_role_article_meta: Artikelen
+      default_role_finance: Financiën
+      default_role_invoices: Rekeningen
+      default_role_orders: Bestellingen
+      default_role_pickups: Ophaaldagen
+      default_role_suppliers: Leveranciers
       disable_invite: Uitnodigingen deactiveren
       email_from: From adres
       email_replyto: Reply-to adres
@@ -614,6 +664,7 @@ nl:
       messages: Berichten
       others: Overig
       payment: Financiën
+      security: Beveiliging
       tasks: Taken
   deliveries:
     add_stock_change:
@@ -702,6 +753,8 @@ nl:
       close:
         alert: 'Er trad een fout op bij het afrekenen: %{message}'
         notice: Bestelling is succesvol afgerekend, de tegoeden van de leden zijn bijgewerkt.
+      close_all_direct_with_invoice:
+        notice: '%{count} bestellingen zijn afgerekend.'
       close_direct:
         alert: 'Bestelling kan niet afgerekend worden: %{message}'
         notice: Bestelling is afgerekend.
@@ -715,14 +768,18 @@ nl:
       edit_results_by_articles:
         add_article: Artikel toevoegen
         amount: Aantal
+        edit_transport: Vervoer bewerken
         gross: Bruto
         net: Netto
+      edit_transport:
+        title: Vervoerskosten verdelen
       group_order_articles:
         add_group: Huishouden toevoegen
         total: Totale prijs
         total_fc: Som (FC-prijs)
         units: Eenheden
       index:
+        close_all_direct_with_invoice: Alles afrekenen met factuur
         title: Gesloten bestellingen
       invoice:
         edit: Factuur bewerken
@@ -773,24 +830,59 @@ nl:
         with_extra_charge: 'inclusief marge:'
         without_extra_charge: 'zonder marge:'
     bank_accounts:
-      controller:
-        import:
-          notice: '%{count} nieuwe transacties zijn geïmporteerd'
+      assign_unlinked_transactions:
+        notice: '%{count} transacties hebben een link toegewezen gekregen'
+      import:
+        notice: '%{count} nieuwe transacties zijn geïmporteerd'
+        no_import_method: Voor deze bankrekening is geen importmethode geconfigureerd.
+        submit: Importeren
+        title: Importeer banktransacties voor %{name}
       index:
-        account_statement: Rekeningafschrift
         title: Bankrekeningen
     bank_transactions:
       index:
+        assign_unlinked_transactions: Transacties toewijzen
+        import_transactions: Importeren
         title: Banktransacties voor %{name} (%{balance})
       show:
+        add_financial_link: Financiële link toevoegen
         belongs_to_supplier: hoort bij leverancier
         belongs_to_user: hoort bij gebruiker
         in_ordergroup: in huishouden
+      transactions:
+        add_financial_link: Link toevoegen
     create:
       notice: Rekening is gemaakt.
     financial_links:
+      add_bank_transaction:
+        notice: Een link naar de banktransactie is toegevoegd.
+      add_financial_transaction:
+        notice: Een link naar de financiële transactie is toegevoegd.
+      add_invoice:
+        notice: Een link naar de factuur is toegevoegd.
+      create:
+        notice: Een nieuwe financiële link is aangemaakt.
+      index_bank_transaction:
+        title: Banktransactie toevoegen
+      index_financial_transaction:
+        title: Financiële transactie toevoegen
+      index_invoice:
+        title: Factuur toevoegen
+      remove_bank_transaction:
+        notice: De link naar de banktransactie is verwijderd.
+      remove_financial_transaction:
+        notice: Een link naar de financiële transactie is verwijderd.
+      remove_invoice:
+        notice: Een link naar de factuur is verwijderd.
       show:
+        add_bank_transaction: Banktransactie toevoegen
+        add_financial_transaction: Financiële transactie toevoegen
+        add_invoice: Factuur toevoegen
+        amount: Bedrag
+        date: Datum
+        description: Omschrijving
         title: Financiële link %{number}
+        type: Type
     financial_transactions:
       controller:
         create:
@@ -799,6 +891,8 @@ nl:
           alert: 'Er is een fout opgetreden: %{error}'
           error_note_required: Notitie ontbreekt.
           notice: Alle transacties zijn opgeslagen.
+        destroy:
+          notice: De transactie is verwijderd.
       index:
         balance: 'Tegoed: %{balance}'
         last_updated_at: "(laatst bijgewerkt %{when} geleden)"
@@ -809,9 +903,13 @@ nl:
         title: Financiële transacties
       new:
         paragraph: Hier kun je het tegoed van huishouden <b>%{name}</b> ophogen en verlagen.
+        paragraph_foodcoop: Hier kun je het tegoed van van de <b>foodcoop</b> verhogen en verlagen.
         title: Nieuwe transactie
       new_collection:
         add_all_ordergroups: Alle huishoudens toevoegen
+        add_all_ordergroups_custom_field: Alle huishoudens met %{label} toevoegen
+        create_financial_link: Maak een gemeenschappelijke financiële link voor de nieuwe transacties.
+        create_foodcoop_transaction: Maak een transactie met de omgekeerde som van de foodcoop (in het geval van een "dubbele boekhouding")
         new_ordergroup: Nog een huishouden toevoegen
         save: Transactie opslaan
         set_balance: Zet saldo van het huishouden op het ingevoerde bedrag.
@@ -820,6 +918,11 @@ nl:
       ordergroup:
         remove: Verwijderen
         remove_group: Huishouden verwijderen
+      transactions:
+        confirm_revert: Weet je zeker dat je %{name} ongedaan wil maken? In dit geval zal een nieuwe transactie met een omgekeerd bedrag worden aangemaakt en, samen met de oorspronkelijke transactie, worden verborgen. Deze verborgen transactie is alleen zichtbaar via de 'Toon verborgen' optie en onzichtbaar voor normale gebruikers.
+        revert_title: Transactie ongedaan maken, waardoor deze onzichtbaar wordt voor normale gebruikers.
+      transactions_search:
+        show_hidden: Toon verborgen transacties
     index:
       amount_fc: Bedrag(FC)
       end: Einde
@@ -836,6 +939,7 @@ nl:
         attachment_hint: Alleen JPEG en PDF zijn toegestaan.
       index:
         action_new: Nieuwe factuur toevoegen
+        show_unpaid: Toon onbetaalde facturen
         title: Facturen
       new:
         title: Nieuwe factuur toevoegen
@@ -849,6 +953,7 @@ nl:
       index:
         new_transaction: Nieuwe transacties toevoegen
         show_all: Transactieoverzicht
+        show_foodcoop: Foodcoop transacties
         title: Tegoeden beheren
       ordergroups:
         account_statement: Rekeningafschrift
@@ -993,6 +1098,7 @@ nl:
       warning: Opgelet, als je minder dan %{threshold} appelpunten hebt, kun je geen bestelling plaatsen!
     changes_saved: Wijzigingen opgeslagen.
     index:
+      due_date_format: "%A %d %B"
       my_ordergroup:
         last_update: Laatst gewijzigd %{when} geleden
         title: Mijn huishouden
@@ -1027,6 +1133,12 @@ nl:
       user:
         since: "(gebruiker sinds %{when})"
         title: "%{user}"
+    reference_calculator:
+      placeholder: Vul de bedragen in die je wilt overschrijven in ieder veld om te zien welke referentie je kunt gebruiken voor de transactie.
+      text0: Maak
+      text1: over met referentie
+      text2: naar de bankrekening
+      title: Referentie calculator
     start_nav:
       admin: Administratie
       finances:
@@ -1063,6 +1175,9 @@ nl:
       confirm_change: Als je naar een andere bestelling gaat, gaan je aanpassingen in deze bestelling verloren. Wijzigingen vergeten en naar de andere bestelling gaan?
   layouts:
     email:
+      footer_1_separator: "--"
+      footer_2_foodsoft: 'Foodsoft: %{url}'
+      footer_3_homepage: 'Foodcoop: %{url}'
       footer_4_help: 'Help: %{url}'
     foodsoft: Foodsoft
     footer:
@@ -1075,6 +1190,7 @@ nl:
       logout: Uitloggen
       ordergroup: Mijn huishouden
       profile: Profiel aanpassen
+      reference_calculator: Referentie calculator
     logo: "<span>food</span>soft"
   lib:
     render_pdf:
@@ -1103,6 +1219,7 @@ nl:
       submit: Nieuw wachtwoord opslaan
       title: Nieuw wachtwoord
   mailer:
+    dateformat: "%d %b"
     feedback:
       header: "%{user} schreef op %{date}:"
       subject: Feedback van %{email}
@@ -1148,6 +1265,8 @@ nl:
         Beste %{ordergroup}.
 
         De bestelling voor "%{order}" is om %{when} gesloten door %{user}.
+      text1: |
+        Het kan vermoedelijk worden opgehaald op %{pickup}.
       text2: |
         De volgende artikelen zijn voor jouw huishouden besteld:
       text3: |-
@@ -1191,6 +1310,19 @@ nl:
         Je taken: %{user_tasks_url}
 
         Groeten van %{foodcoop}.
+    welcome:
+      subject: Welkom bij de foodcoop
+      text0: |
+        Beste %{user},
+
+        een nieuw Foodsoft account is voor je aangemaakt.
+      text1: |
+        Klik op deze link om een nieuw wachtwoord in te stellen: %{link}
+        Deze link werkt slechts eenmaal en verloopt op %{expires}.
+        Je kunt altijd "Wachtwoord vergeten?" gebruiken om een nieuwe link te krijgen.
+
+
+        Vriendelijke groeten van %{foodcoop}.
   messages_mailer:
     foodsoft_message:
       footer: |
@@ -1202,6 +1334,8 @@ nl:
   model:
     delivery:
       each_stock_article_must_be_unique: In een levering mag ieder voorraadsartikel maar een keer voorkomen.
+    financial_transaction:
+      foodcoop_name: Foodcoop
     financial_transaction_type:
       no_delete_last: Er moet ten minste één financiëel transactie type bestaan.
     group_order:
@@ -1329,6 +1463,7 @@ nl:
       consider_member_tolerance: verdelen over tolerantie van leden
       notice: 'Bestelling ontvangen: %{msg}'
       notice_none: Geen nieuwe artikelen te ontvangen
+      paragraph: Als de bestelde en ontvangen hoeveelheid hetzelfde zijn, kan het veld leeg blijven. Het is nog steeds een goed idee om alles in te vullen, zodat je achteraf kunt zien of alles is gecontroleerd.
       rest_to_stock: naar voorraad
       submit: Bestelling ontvangen
       surplus_options: 'Overschot:'
@@ -1676,12 +1811,23 @@ nl:
     delete: Verwijder
     download: Download
     edit: Bewerk
+    marks:
+      close: "&times;"
+      success: <i class="icon icon-ok"></i>
+    move: Verplaatsen
     or_cancel: of annuleren
     please_wait: Een moment alstublieft...
     restore: Herstellen
     save: Opslaan
     search_placeholder: Zoeken ...
     show: Tonen
+  views:
+    pagination:
+      first: "&laquo;"
+      last: "&raquo;"
+      next: "&rsaquo;"
+      previous: "&lsaquo;"
+      truncate: "..."
   workgroups:
     edit:
       title: Werkgroep bewerken

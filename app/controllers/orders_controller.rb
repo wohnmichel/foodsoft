@@ -60,8 +60,15 @@ class OrdersController < ApplicationController
 
   # Page to create a new order.
   def new
-    @order = Order.new(supplier_id: params[:supplier_id]).init_dates
-    @order.article_ids = Order.find(params[:order_id]).article_ids if params[:order_id]
+    if params[:order_id]
+      old_order = Order.find(params[:order_id])
+      @order = Order.new(supplier_id: old_order.supplier_id).init_dates
+      @order.article_ids = old_order.article_ids
+    else
+      @order = Order.new(supplier_id: params[:supplier_id]).init_dates
+    end
+  rescue => error
+    redirect_to orders_url, alert: t('errors.general_msg', msg: error.message)
   end
 
   # Save a new order.
@@ -69,6 +76,7 @@ class OrdersController < ApplicationController
   def create
     @order = Order.new(params[:order])
     @order.created_by = current_user
+    @order.updated_by = current_user
     if @order.save
       flash[:notice] = I18n.t('orders.create.notice')
       redirect_to @order
@@ -87,7 +95,7 @@ class OrdersController < ApplicationController
   # Update an existing order.
   def update
     @order = Order.find params[:id]
-    if @order.update_attributes params[:order]
+    if @order.update_attributes params[:order].merge(updated_by: current_user)
       flash[:notice] = I18n.t('orders.update.notice')
       redirect_to :action => 'show', :id => @order
     else

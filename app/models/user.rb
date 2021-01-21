@@ -20,7 +20,7 @@ class User < ApplicationRecord
   has_many :created_orders, :class_name => 'Order', :foreign_key => 'created_by_user_id', :dependent => :nullify
   has_many :mail_delivery_status, :class_name => 'MailDeliveryStatus', :foreign_key => 'email', :primary_key => 'email'
 
-  attr_accessor :password, :settings_attributes
+  attr_accessor :create_ordergroup, :password, :send_welcome_mail, :settings_attributes
 
   scope :deleted, -> { where.not(deleted_at: nil) }
   scope :undeleted, -> { where(deleted_at: nil) }
@@ -52,6 +52,13 @@ class User < ApplicationRecord
     settings.defaults['notify']   = { 'upcoming_tasks' => true  }         unless settings.notify
   end
 
+  before_save do
+    if send_welcome_mail?
+      self.reset_password_token = new_random_password(16)
+      self.reset_password_expires = Time.now.advance(days: 2)
+    end
+  end
+
   after_save do
     settings_attributes.each do |key, value|
       value.each do |k, v|
@@ -64,6 +71,18 @@ class User < ApplicationRecord
       end
       self.settings.merge!(key, value)
     end if settings_attributes
+
+    if ActiveModel::Type::Boolean.new.cast(create_ordergroup)
+      og = Ordergroup.new({name: name})
+      og.memberships.build({user: self})
+      og.save!
+    end
+
+    Mailer.welcome(self).deliver_now if send_welcome_mail?
+  end
+
+  def send_welcome_mail?
+    ActiveModel::Type::Boolean.new.cast(send_welcome_mail)
   end
 
   # sorted by display name

@@ -21,6 +21,12 @@ class ArticlesController < ApplicationController
     end
 
     @articles = Article.undeleted.where(supplier_id: @supplier, :type => nil).includes(:article_category).order(sort)
+
+    if request.format.csv?
+      send_data ArticlesCsv.new(@articles, encoding: 'utf-8').to_csv, filename: 'articles.csv', type: 'text/csv'
+      return
+    end
+
     @articles = @articles.where('articles.name LIKE ?', "%#{params[:query]}%") unless params[:query].nil?
 
     @articles = @articles.page(params[:page]).per(@per_page)
@@ -209,10 +215,10 @@ class ArticlesController < ApplicationController
   #
   def shared
     # build array of keywords, required for ransack _all suffix
-    params[:q][:name_cont_all] = params[:q][:name_cont_all].split(' ') if params[:q]
-    # Build search with meta search plugin
-    @search = @supplier.shared_supplier.shared_articles.search(params[:q])
-    @articles = @search.result.page(params[:page]).per(10)
+    q = params.fetch(:q, {})
+    q[:name_cont_all] = params.fetch(:name_cont_all_joined, '').split(' ')
+    search = @supplier.shared_supplier.shared_articles.ransack(q)
+    @articles = search.result.page(params[:page]).per(10)
     render :layout => false
   end
 

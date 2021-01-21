@@ -1,5 +1,5 @@
 class Finance::FinancialLinksController < Finance::BaseController
-  before_action :find_financial_link, except: [:create]
+  before_action :find_financial_link, except: [:create, :incomplete]
 
   def show
     @items = @financial_link.bank_transactions.map do |bt|
@@ -16,9 +16,9 @@ class Finance::FinancialLinksController < Finance::BaseController
       {
         date: ft.created_on,
         type: t('activerecord.models.financial_transaction'),
-        description: "#{ft.ordergroup.name}: #{ft.note}",
+        description: "#{ft.ordergroup_name}: #{ft.note}",
         amount: ft.amount,
-        link_to: finance_ordergroup_transactions_path(ft.ordergroup),
+        link_to: finance_group_transactions_path(ft.ordergroup),
         remove_path: remove_financial_transaction_finance_link_path(@financial_link, ft)
       }
     end
@@ -42,6 +42,10 @@ class Finance::FinancialLinksController < Finance::BaseController
       bank_transaction.update_attribute :financial_link, @financial_link
     end
     redirect_to finance_link_url(@financial_link), notice: t('.notice')
+  end
+
+  def incomplete
+    @financial_links = FinancialLink.incomplete
   end
 
   def index_bank_transaction
