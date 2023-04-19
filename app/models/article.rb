@@ -1,5 +1,5 @@
-# encoding: utf-8
 class Article < ApplicationRecord
+  include LocalizeInput
   include PriceCalculation
 
   # @!attribute name
@@ -43,6 +43,12 @@ class Article < ApplicationRecord
   # @!attribute article_prices
   #   @return [Array<ArticlePrice>] Price history (current price first).
   has_many :article_prices, -> { order("created_at DESC") }
+  # @!attribute order_articles
+  #   @return [Array<OrderArticle>] Order articles for this article.
+  has_many :order_articles
+  # @!attribute order
+  #   @return [Array<Order>] Orders this article appears in.
+  has_many :orders, through: :order_articles
 
   # Replace numeric seperator with database format
   localize_input_of :price, :tax, :deposit
@@ -57,16 +63,28 @@ class Article < ApplicationRecord
   validates_presence_of :name, :unit, :price, :tax, :deposit, :unit_quantity, :supplier_id, :article_category
   validates_length_of :name, :in => 4..60
   validates_length_of :unit, :in => 1..15
+  validates_length_of :note, :maximum => 255
+  validates_length_of :origin, :maximum => 255
+  validates_length_of :manufacturer, :maximum => 255
+  validates_length_of :order_number, :maximum => 255
   validates_numericality_of :price, :greater_than_or_equal_to => 0
   validates_numericality_of :unit_quantity, :greater_than => 0
   validates_numericality_of :deposit, :tax
-  #validates_uniqueness_of :name, :scope => [:supplier_id, :deleted_at, :type], if: Proc.new {|a| a.supplier.shared_sync_method.blank? or a.supplier.shared_sync_method == 'import' }
-  #validates_uniqueness_of :name, :scope => [:supplier_id, :deleted_at, :type, :unit, :unit_quantity]
+  # validates_uniqueness_of :name, :scope => [:supplier_id, :deleted_at, :type], if: Proc.new {|a| a.supplier.shared_sync_method.blank? or a.supplier.shared_sync_method == 'import' }
+  # validates_uniqueness_of :name, :scope => [:supplier_id, :deleted_at, :type, :unit, :unit_quantity]
   validate :uniqueness_of_name
 
   # Callbacks
   before_save :update_price_history
   before_destroy :check_article_in_use
+
+  def self.ransackable_attributes(auth_object = nil)
+    %w(id name supplier_id article_category_id unit note manufacturer origin unit_quantity order_number)
+  end
+
+  def self.ransackable_associations(auth_object = nil)
+    %w(article_category supplier order_articles orders)
+  end
 
   # Returns true if article has been updated at least 2 days ago
   def recently_updated
@@ -77,7 +95,7 @@ class Article < ApplicationRecord
   def in_open_order
     @in_open_order ||= begin
       order_articles = OrderArticle.where(order_id: Order.open.collect(&:id))
-      order_article = order_articles.detect {|oa| oa.article_id == id }
+      order_article = order_articles.detect { |oa| oa.article_id == id }
       order_article ? order_article.order : nil
     end
   end
@@ -110,7 +128,7 @@ class Article < ApplicationRecord
   # @param new_article [Article] New article to update self
   # @option options [Boolean] :convert_units Omit or set to +true+ to keep current unit and recompute unit quantity and price.
   # @return [Hash<Symbol, Object>] Attributes with new values
-  def unequal_attributes(new_article, options={})
+  def unequal_attributes(new_article, options = {})
     # try to convert different units when desired
     if options[:convert_units] == false
       new_price, new_unit_quantity = nil, nil
@@ -148,7 +166,7 @@ class Article < ApplicationRecord
   # @return [Hash<Symbol, Object>] Changed attributes with new values
   def self.compare_attributes(attributes)
     unequal_attributes = attributes.select { |name, values| values[0] != values[1] && !(values[0].blank? && values[1].blank?) }
-    Hash[unequal_attributes.to_a.map {|a| [a[0], a[1].last]}]
+    Hash[unequal_attributes.to_a.map { |a| [a[0], a[1].last] }]
   end
 
   # to get the correspondent shared article
@@ -169,7 +187,7 @@ class Article < ApplicationRecord
         # try to match the size out of its name, e.g. "banana 10-12 St" => 10
         new_unit_quantity = /[0-9\-\s]+(St)/.match(new_article.name).to_s.to_i
         if new_unit_quantity && new_unit_quantity > 0
-          new_price = (new_article.price/new_unit_quantity.to_f).round(2)
+          new_price = (new_article.price / new_unit_quantity.to_f).round(2)
           [new_price, new_unit_quantity]
         else
           false
@@ -236,5 +254,4 @@ class Article < ApplicationRecord
       errors.add :name, :taken_with_unit if matches.where(unit: unit, unit_quantity: unit_quantity).any?
     end
   end
-
 end

@@ -1,6 +1,4 @@
-# encoding: utf-8
 class Finance::BalancingController < Finance::BaseController
-
   def index
     @orders = Order.finished.page(params[:page]).per(@per_page).order('ends DESC')
   end
@@ -15,16 +13,16 @@ class Finance::BalancingController < Finance::BaseController
                                                        
     sort_param = params['sort'] || 'order_number'
     @articles = case sort_param
-                  when 'name' then
-                    @articles.order('articles.name ASC')
-                  when 'name_reverse' then
-                    @articles.order('articles.name DESC')
-                  when 'order_number' then
-                    @articles.order('articles.order_number ASC')
-                  when 'order_number_reverse' then
-                    @articles.order('articles.order_number DESC')
-                  else
-                    @articles
+                when 'name' then
+                  @articles.order('articles.name ASC')
+                when 'name_reverse' then
+                  @articles.order('articles.name DESC')
+                when 'order_number' then
+                  @articles.order('articles.order_number ASC')
+                when 'order_number_reverse' then
+                  @articles.order('articles.order_number DESC')
+                else
+                  @articles
                 end
 
     render layout: false if request.xhr?
@@ -53,7 +51,7 @@ class Finance::BalancingController < Finance::BaseController
 
   def update_note
     @order = Order.find(params[:id])
-    if @order.update_attributes(params[:order])
+    if @order.update(params[:order])
       render :layout => false
     else
       render :action => :edit_note, :layout => false
@@ -67,7 +65,7 @@ class Finance::BalancingController < Finance::BaseController
 
   def update_transport
     @order = Order.find(params[:id])
-    @order.update_attributes! params[:order]
+    @order.update!(params[:order])
     redirect_to new_finance_order_path(order_id: @order.id)
   rescue => error
     redirect_to new_finance_order_path(order_id: @order.id), alert: t('errors.general_msg', msg: error.message)
@@ -84,7 +82,6 @@ class Finance::BalancingController < Finance::BaseController
     @type = FinancialTransactionType.find_by_id(params.permit(:type)[:type])
     @order.close!(@current_user, @type)
     redirect_to finance_order_index_url, notice: t('finance.balancing.close.notice')
-
   rescue => error
     redirect_to new_finance_order_url(order_id: @order.id), alert: t('finance.balancing.close.alert', message: error.message)
   end
@@ -110,5 +107,4 @@ class Finance::BalancingController < Finance::BaseController
   rescue => error
     redirect_to finance_order_index_url, alert: t('errors.general_msg', msg: error.message)
   end
-
 end

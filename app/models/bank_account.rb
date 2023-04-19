@@ -1,6 +1,7 @@
 class BankAccount < ApplicationRecord
-
   has_many :bank_transactions, dependent: :destroy
+  has_many :supplier_categories, dependent: :nullify
+  belongs_to :bank_gateway, optional: true
 
   normalize_attributes :name, :iban, :description
 
@@ -23,5 +24,9 @@ class BankAccount < ApplicationRecord
       end
     end
     count
+  end
+
+  def last_transaction_date
+    bank_transactions.order(date: :desc).first&.date
   end
 end

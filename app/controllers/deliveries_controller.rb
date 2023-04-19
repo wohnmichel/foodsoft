@@ -1,6 +1,4 @@
-# encoding: utf-8
 class DeliveriesController < ApplicationController
-
   before_action :find_supplier, :exclude => :fill_new_stock_article_form
 
   def index
@@ -14,7 +12,7 @@ class DeliveriesController < ApplicationController
 
   def new
     @delivery = @supplier.deliveries.build
-    @delivery.date = Date.today #TODO: move to model/database
+    @delivery.date = Date.today # TODO: move to model/database
   end
 
   def create
@@ -35,9 +33,9 @@ class DeliveriesController < ApplicationController
   def update
     @delivery = Delivery.find(params[:id])
 
-    if @delivery.update_attributes(params[:delivery])
+    if @delivery.update(params[:delivery])
       flash[:notice] = I18n.t('deliveries.update.notice')
-      redirect_to [@supplier,@delivery]
+      redirect_to [@supplier, @delivery]
     else
       render :action => "edit"
     end
@@ -68,5 +66,4 @@ class DeliveriesController < ApplicationController
 
     render :layout => false
   end
-
 end

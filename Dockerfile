@@ -34,14 +34,15 @@ RUN export DATABASE_URL=mysql2://localhost/temp?encoding=utf8 && \
     export SECRET_KEY_BASE=thisisnotimportantnow && \
     export DEBIAN_FRONTEND=noninteractive && \
     apt-get update && \
-    apt-get install -y mariadb-server && \
-    /etc/init.d/mysql start && \
+    apt-get install -y mariadb-server nodejs && \
+    /etc/init.d/mariadb start && \
     mariadb -e "CREATE DATABASE temp" && \
     cp config/app_config.yml.SAMPLE config/app_config.yml && \
     cp config/database.yml.MySQL_SAMPLE config/database.yml && \
+    cp config/storage.yml.SAMPLE config/storage.yml && \
     bundle exec rake db:setup assets:precompile && \
     rm -Rf tmp/* && \
-    /etc/init.d/mysql stop && \
+    /etc/init.d/mariadb stop && \
     rm -Rf /run/mysqld /tmp/* /var/tmp/* /var/lib/mysql /var/log/mysql* && \
     apt-get purge -y --auto-remove mariadb-server && \
     rm -Rf /var/lib/apt/lists/* /var/cache/apt/*
@@ -55,6 +56,8 @@ RUN mkdir -p tmp && \
 USER nobody
 
 EXPOSE 3000
+
+VOLUME /usr/src/app/storage
 
 # cleanup, and by default start web process from Procfile
 ENTRYPOINT ["./docker-entrypoint.sh"]

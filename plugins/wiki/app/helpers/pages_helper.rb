@@ -2,11 +2,11 @@ module PagesHelper
   include WikiCloth
 
   def rss_meta_tag
-    tag('link', :rel => "alternate", :type => "application/rss+xml", :title => "RSS", :href => all_pages_rss_url).html_safe
+    tag.link(rel: "alternate", type: "application/rss+xml", title: "RSS", href: all_pages_rss_url).html_safe
   end
 
   def wikified_body(body, title = nil)
-    FoodsoftWiki::WikiParser.new(data: body+"\n", params: {referer: title}).to_html(noedit: true).html_safe
+    FoodsoftWiki::WikiParser.new(data: body + "\n", params: { referer: title }).to_html(noedit: true).html_safe
   rescue => e
     # try the following with line breaks: === one === == two == = three =
     content_tag :span, class: 'alert alert-error' do
@@ -22,13 +22,12 @@ module PagesHelper
     end
   end
 
-
   def link_to_wikipage_by_permalink(permalink, text = nil)
     unless permalink.blank?
       page = Page.find_by_permalink(permalink)
       if page.nil?
         if text.nil?
-          link_to permalink,  new_page_path(:title => permalink)
+          link_to permalink, new_page_path(:title => permalink)
         else
           link_to text,  new_page_path(:title => permalink)
         end
@@ -65,9 +64,8 @@ module PagesHelper
   end
 
   # return url for all_pages rss feed
-  def all_pages_rss_url(options={})
+  def all_pages_rss_url(options = {})
     token = TokenVerifier.new(['wiki', 'all']).generate
-    all_pages_url({:format => 'rss', :token => token}.merge(options))
+    all_pages_url({ :format => 'rss', :token => token }.merge(options))
   end
-
 end

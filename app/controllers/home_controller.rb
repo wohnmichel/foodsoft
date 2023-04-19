@@ -1,6 +1,4 @@
-# encoding: utf-8
 class HomeController < ApplicationController
-
   def index
     # unaccepted tasks
     @unaccepted_tasks = Task.order(:due_date).unaccepted_tasks_for(current_user)
@@ -25,8 +23,8 @@ class HomeController < ApplicationController
   end
 
   def update_profile
-    if @current_user.update_attributes(user_params)
-      @current_user.ordergroup.update_attributes(ordergroup_params) if ordergroup_params
+    if @current_user.update(user_params)
+      @current_user.ordergroup.update(ordergroup_params) if ordergroup_params
       session[:locale] = @current_user.locale
       redirect_to my_profile_url, notice: I18n.t('home.changes_saved')
     else
@@ -44,13 +42,13 @@ class HomeController < ApplicationController
 
       if params['sort']
         sort = case params['sort']
-        when "date"  then "created_on"
-        when "note"   then "note"
-        when "amount" then "amount"
-        when "date_reverse"  then "created_on DESC"
-        when "note_reverse" then "note DESC"
-        when "amount_reverse" then "amount DESC"
-        end
+               when "date" then "created_on"
+               when "note"   then "note"
+               when "amount" then "amount"
+               when "date_reverse" then "created_on DESC"
+               when "note_reverse" then "note DESC"
+               when "amount_reverse" then "amount DESC"
+               end
       else
         sort = "created_on DESC"
       end
@@ -66,7 +64,7 @@ class HomeController < ApplicationController
   # cancel personal memberships direct from the myProfile-page
   def cancel_membership
     if params[:membership_id]
-      membership = @current_user.memberships.find!(params[:membership_id])
+      membership = @current_user.memberships.find(params[:membership_id])
     else
       membership = @current_user.memberships.find_by_group_id!(params[:group_id])
     end
@@ -88,5 +86,4 @@ class HomeController < ApplicationController
       params.require(:user).require(:ordergroup).permit(:contact_address)
     end
   end
-
 end

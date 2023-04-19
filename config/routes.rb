@@ -1,5 +1,4 @@
 Rails.application.routes.draw do
-
   get "order_comments/new"
 
   get "comments/new"
@@ -9,7 +8,6 @@ Rails.application.routes.draw do
   root to: 'sessions#redirect_to_foodcoop', as: nil
 
   scope '/:foodcoop' do
-
     use_doorkeeper
 
     # Root path
@@ -190,6 +188,9 @@ Rails.application.routes.draw do
           get :index_invoice
           put 'invoices/:invoice', action: 'add_invoice', as: 'add_invoice'
           delete 'invoices/:invoice', action: 'remove_invoice', as: 'remove_invoice'
+
+          get :new_financial_transaction
+          post :create_financial_transaction
         end
       end
 
@@ -214,7 +215,6 @@ Rails.application.routes.draw do
       end
 
       resources :bank_transactions, only: [:index, :show]
-
     end
 
     ########### Administration
@@ -224,12 +224,16 @@ Rails.application.routes.draw do
 
       resources :finances, only: [:index] do
         get :update_bank_accounts, on: :collection
+        get :update_bank_gateways, on: :collection
         get :update_transaction_types, on: :collection
+        get :update_supplier_categories, on: :collection
       end
 
       resources :bank_accounts
+      resources :bank_gateways
       resources :financial_transaction_classes
       resources :financial_transaction_types
+      resources :supplier_categories
 
       resources :users do
         post :restore, on: :member
@@ -262,10 +266,18 @@ Rails.application.routes.draw do
 
         namespace :user do
           root to: 'users#show'
-          resources :financial_transactions, only: [:index, :show]
+          get :financial_overview, to: 'ordergroup#financial_overview'
+          resources :financial_transactions, only: [:index, :show, :create]
+          resources :group_order_articles
         end
 
+        resources :financial_transaction_classes, only: [:index, :show]
+        resources :financial_transaction_types, only: [:index, :show]
         resources :financial_transactions, only: [:index, :show]
+        resources :orders, only: [:index, :show]
+        resources :order_articles, only: [:index, :show]
+        resources :group_order_articles
+        resources :article_categories, only: [:index, :show]
       end
     end
 
@@ -276,6 +288,5 @@ Rails.application.routes.draw do
     ############## The rest
 
     resources :users, only: [:index]
-
   end # End of /:foodcoop scope
 end

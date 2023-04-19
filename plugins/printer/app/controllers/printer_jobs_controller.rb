@@ -17,6 +17,7 @@ class PrinterJobsController < ApplicationController
     PrinterJob.transaction do
       %w(articles fax groups matrix).each do |document|
         next unless FoodsoftConfig["printer_print_order_#{document}"]
+
         job = PrinterJob.create! order: order, document: document, created_by: current_user
         job.add_update! state
         count += 1
@@ -27,6 +28,14 @@ class PrinterJobsController < ApplicationController
 
   def show
     @job = PrinterJob.find(params[:id])
+  end
+
+  def requeue
+    job = PrinterJob.find(params[:id])
+    job = PrinterJob.create! order: job.order, document: job.document, created_by: current_user
+    job.add_update! 'requeued'
+    PrinterChannel.broadcast_unfinished
+    redirect_to printer_jobs_path, notice: t('.notice')
   end
 
   def document

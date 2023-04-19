@@ -1,5 +1,6 @@
 class Invoice < ApplicationRecord
   include CustomFields
+  include LocalizeInput
 
   belongs_to :supplier
   belongs_to :created_by, :class_name => 'User', :foreign_key => 'created_by_user_id'
@@ -39,6 +40,24 @@ class Invoice < ApplicationRecord
   # Amount without deposit
   def net_amount
     amount - deposit + deposit_credit
+  end
+
+  def orders_sum
+    orders
+      .joins(order_articles: [:article_price])
+      .sum("COALESCE(order_articles.units_received, order_articles.units_billed, order_articles.units_to_order)" \
+        + "* article_prices.unit_quantity" \
+        + "* ROUND((article_prices.price + article_prices.deposit) * (100 + article_prices.tax) / 100, 2)")
+  end
+
+  def orders_transport_sum
+    orders.sum(:transport)
+  end
+
+  def expected_amount
+    return net_amount unless orders.any?
+
+    orders_sum + orders_transport_sum
   end
 
   protected

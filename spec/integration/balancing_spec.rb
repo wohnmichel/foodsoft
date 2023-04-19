@@ -2,8 +2,8 @@ require_relative '../spec_helper'
 
 feature 'settling an order', js: true do
   let(:ftt) { create :financial_transaction_type }
-  let(:admin) { create :user, groups:[create(:workgroup, role_finance: true)] }
-  let(:user) { create :user, groups:[create(:ordergroup)] }
+  let(:admin) { create :user, groups: [create(:workgroup, role_finance: true)] }
+  let(:user) { create :user, groups: [create(:ordergroup)] }
   let(:supplier) { create :supplier }
   let(:article) { create :article, supplier: supplier, unit_quantity: 1 }
   let(:order) { create :order, supplier: supplier, article_ids: [article.id] } # need to ref article
@@ -12,6 +12,7 @@ feature 'settling an order', js: true do
   let(:oa) { order.order_articles.find_by_article_id(article.id) }
   let(:goa1) { create :group_order_article, group_order: go1, order_article: oa }
   let(:goa2) { create :group_order_article, group_order: go2, order_article: oa }
+
   before do
     goa1.update_quantities(3, 0)
     goa2.update_quantities(1, 0)
@@ -29,6 +30,7 @@ feature 'settling an order', js: true do
   end
 
   before { login admin }
+
   before { visit new_finance_order_path(order_id: order.id) }
 
   it 'has product ordered visible' do
@@ -95,7 +97,7 @@ feature 'settling an order', js: true do
   end
 
   it 'deletes a GroupOrderArticle with no ordered amounts' do
-    goa1.update_attributes({:quantity => 0, :tolerance => 0})
+    goa1.update(quantity: 0, tolerance: 0)
     click_link article.name
     expect(page).to have_selector("#group_order_article_#{goa1.id}")
     within("#group_order_article_#{goa1.id}") do
@@ -111,7 +113,7 @@ feature 'settling an order', js: true do
       click_link I18n.t('ui.edit')
     end
     within("#edit_order_article_#{oa.id}") do
-      find('#order_article_units_to_order').set(0)
+      find_by_id('order_article_units_to_order').set(0)
       sleep 0.25
       find('input[type="submit"]').click
     end
@@ -133,7 +135,7 @@ feature 'settling an order', js: true do
     expect(page).to have_selector('form#new_group_order_article')
     within('#new_group_order_article') do
       select user.ordergroup.name, :from => 'group_order_article_ordergroup_id'
-      find('#group_order_article_result').set(8)
+      find_by_id('group_order_article_result').set(8)
       sleep 0.25
       find('input[type="submit"]').click
     end
@@ -172,12 +174,12 @@ feature 'settling an order', js: true do
     click_link I18n.t('finance.balancing.edit_results_by_articles.add_article')
     expect(page).to have_selector('form#new_order_article')
     within('#new_order_article') do
-      find('#order_article_article_id').select(new_article.name)
+      find_by_id('order_article_article_id').select(new_article.name)
       sleep 0.25
       find('input[type="submit"]').click
     end
     expect(page).to_not have_selector('form#new_order_article')
     expect(page).to have_content(new_article.name)
-    expect(order.order_articles.where(article_id: new_article.id)).to_not be nil
+    expect(order.order_articles.where(article_id: new_article.id)).to_not be_nil
   end
 end

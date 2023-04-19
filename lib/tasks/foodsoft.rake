@@ -51,15 +51,15 @@ namespace :foodsoft do
 
   desc "Parse incoming email on stdin (options: RECIPIENT=foodcoop.handling)"
   task :parse_reply_email => :environment do
-    FoodsoftMailReceiver.received ENV['RECIPIENT'], STDIN.read
+    FoodsoftMailReceiver.received ENV.fetch('RECIPIENT', nil), STDIN.read
   end
 
   desc "Start STMP server for incoming email (options: SMTP_SERVER_PORT=2525, SMTP_SERVER_HOST=0.0.0.0)"
   task :reply_email_smtp_server => :environment do
     port = ENV['SMTP_SERVER_PORT'].present? ? ENV['SMTP_SERVER_PORT'].to_i : 2525
-    host = ENV['SMTP_SERVER_HOST']
+    host = ENV.fetch('SMTP_SERVER_HOST', nil)
     rake_say "Started SMTP server for incoming email on port #{port}."
-    server = FoodsoftMailReceiver.new port, host, 1, logger: Rails.logger
+    server = FoodsoftMailReceiver.new(ports: port, hosts: host, max_processings: 1, logger: Rails.logger)
     server.start
     server.join
   end
@@ -69,9 +69,11 @@ namespace :foodsoft do
     BankAccount.find_each do |ba|
       importer = ba.find_connector
       next unless importer
+
       importer.load nil
       ok = importer.import nil
       next unless ok
+
       importer.finish
       assign_count = ba.assign_unlinked_transactions
       rake_say "#{ba.name}: imported #{importer.count}, assigned #{assign_count}"

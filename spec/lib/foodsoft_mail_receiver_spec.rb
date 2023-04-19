@@ -1,9 +1,8 @@
 require_relative '../spec_helper'
 
 describe FoodsoftMailReceiver do
-
   before :all do
-    @server = FoodsoftMailReceiver.new 2525, '127.0.0.1', 4, logger_severity: 5
+    @server = FoodsoftMailReceiver.new(ports: '2525', hosts: '127.0.0.1', max_processings: 4, logger_severity: 5)
     @server.start
   end
 
@@ -75,5 +74,4 @@ describe FoodsoftMailReceiver do
   after :all do
     @server.shutdown
   end
-
 end

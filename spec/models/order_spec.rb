@@ -1,6 +1,7 @@
 require_relative '../spec_helper'
 
 describe Order do
+  let!(:ftt) { create :financial_transaction_type }
   let(:user) { create :user, groups: [create(:ordergroup)] }
 
   it 'automaticly finishes ended' do
@@ -15,6 +16,59 @@ describe Order do
     expect(Order.open.count).to eq 3
     expect(Order.finished.count).to eq 1
     expect(order).to be_finished
+  end
+
+  describe 'state scopes and boolean getters' do
+    let!(:open_order)     { create :order, state: 'open'     }
+    let!(:finished_order) { create :order, state: 'finished' }
+    let!(:received_order) { create :order, state: 'received' }
+    let!(:closed_order)   { create :order, state: 'closed'   }
+
+    it 'retrieves open orders in the "open" scope' do
+      expect(Order.open.count).to eq(1)
+      expect(Order.open.where(id: open_order.id)).to exist
+    end
+
+    it 'retrieves finished, received and closed orders in the "finished" scope' do
+      expect(Order.finished.count).to eq(3)
+      expect(Order.finished.where(id: finished_order.id)).to exist
+      expect(Order.finished.where(id: received_order.id)).to exist
+      expect(Order.finished.where(id: closed_order.id)).to exist
+    end
+
+    it 'retrieves finished and received orders in the "finished_not_closed" scope' do
+      expect(Order.finished_not_closed.count).to eq(2)
+      expect(Order.finished_not_closed.where(id: finished_order.id)).to exist
+      expect(Order.finished_not_closed.where(id: received_order.id)).to exist
+    end
+
+    it 'returns valid boolean states for open orders' do
+      expect(open_order.open?).to be(true)
+      expect(open_order.finished?).to be(false)
+      expect(open_order.received?).to be(false)
+      expect(open_order.closed?).to be(false)
+    end
+
+    it 'returns valid boolean states for finished orders' do
+      expect(finished_order.open?).to be(false)
+      expect(finished_order.finished?).to be(true)
+      expect(finished_order.received?).to be(false)
+      expect(finished_order.closed?).to be(false)
+    end
+
+    it 'returns valid boolean states for received orders' do
+      expect(received_order.open?).to be(false)
+      expect(received_order.finished?).to be(true)
+      expect(received_order.received?).to be(true)
+      expect(received_order.closed?).to be(false)
+    end
+
+    it 'returns valid boolean states for closed orders' do
+      expect(closed_order.open?).to be(false)
+      expect(closed_order.finished?).to be(false)
+      expect(closed_order.received?).to be(false)
+      expect(closed_order.closed?).to be(true)
+    end
   end
 
   it 'sends mail if min_order_quantity has been reached' do
@@ -46,7 +100,7 @@ describe Order do
     it 'is not closed by default'   do expect(order).to_not be_closed end
 
     it 'has valid order articles' do
-      order.order_articles.each {|oa| expect(oa).to be_valid }
+      order.order_articles.each { |oa| expect(oa).to be_valid }
     end
 
     it 'can be finished' do
@@ -64,13 +118,13 @@ describe Order do
       expect(order).to_not be_open
       expect(order).to be_closed
     end
-
   end
 
   describe 'with a default end date' do
     let(:order) { create :order }
+
     before do
-      FoodsoftConfig[:order_schedule] = {ends: {recurr: 'FREQ=WEEKLY;BYDAY=MO', time: '9:00'}}
+      FoodsoftConfig[:order_schedule] = { ends: { recurr: 'FREQ=WEEKLY;BYDAY=MO', time: '9:00' } }
       order.init_dates
     end
 
@@ -81,7 +135,6 @@ describe Order do
     it 'to have a correct time' do
       expect(order.ends.strftime('%H:%M')).to eq '09:00'
     end
-
   end
 
   describe 'mapped to GroupOrders' do
@@ -101,4 +154,28 @@ describe Order do
     end
   end
 
+  describe 'balancing charges correct amounts' do
+    let!(:transport) { rand(0.1..26.0).round(2) }
+    let!(:order) { create :order, article_count: 1 }
+    let!(:oa) { order.order_articles.first }
+    let!(:go) { create :group_order, order: order, transport: transport }
+    let!(:goa) { create :group_order_article, group_order: go, order_article: oa, quantity: 1 }
+
+    before do
+      goa.update_quantities(1, 0)
+      go.reload
+      go.update_price!
+      user.ordergroup.update_stats!
+      oa.update_results!
+
+      order.finish!(user)
+      order.reload
+      order.close!(user, ftt)
+    end
+
+    it 'creates financial transaction with correct amount' do
+      expect(goa.result).to be > 0
+      expect(go.ordergroup.financial_transactions.last.amount).to eq(-go.total)
+    end
+  end
 end

@@ -32,6 +32,9 @@ default: &defaults
   # custom foodsoft software URL (used in footer)
   #foodsoft_url: https://github.com/foodcoops/foodsoft
 
+  # URL to redirect to after logging out
+  # logout_redirect_url: https://foodcoop.test
+
   # Default language
   #default_locale: en
   # By default, foodsoft takes the language from the webbrowser/operating system.
@@ -118,9 +121,9 @@ default: &defaults
   #      label: Birthday
   #      as: date_picker
 
-  # Uncomment to add tracking code for web statistics, e.g. for Piwik. (Added to bottom of page)
+  # Uncomment to add tracking code for web statistics, e.g. for Matomo. (Added to bottom of page)
   #webstats_tracking_code: |
-  #  <!-- Piwik -->
+  #  <!-- Matomo -->
   #  ......
 
   # email address to be used as sender
@@ -137,6 +140,8 @@ default: &defaults
   notification:
     error_recipients:
       - admin@foodcoop.test
+    feedback_recipients:
+      - support@foodcoop.test
     sender_address: "\"Foodsoft Error\" <foodsoft@foodcoop.test>"
     email_prefix: "[Foodsoft]"
 

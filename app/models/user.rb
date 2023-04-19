@@ -1,16 +1,14 @@
-# encoding: utf-8
-
 require 'digest/sha1'
 # specific user rights through memberships (see Group)
 class User < ApplicationRecord
   include CustomFields
-  #TODO: acts_as_paraniod ??
+  # TODO: acts_as_paraniod ??
 
   has_many :memberships, :dependent => :destroy
   has_many :groups, :through => :memberships
-  #has_one :ordergroup, :through => :memberships, :source => :group, :class_name => "Ordergroup"
+  # has_one :ordergroup, :through => :memberships, :source => :group, :class_name => "Ordergroup"
   def ordergroup
-    Ordergroup.joins(:memberships).where(memberships: {user_id: self.id}).first
+    Ordergroup.joins(:memberships).where(memberships: { user_id: self.id }).first
   end
 
   has_many :workgroups, :through => :memberships, :source => :group, :class_name => "Workgroup"
@@ -35,7 +33,7 @@ class User < ApplicationRecord
   validates_presence_of :first_name # for simple_form validations
   validates_length_of :first_name, :in => 2..50
   validates_confirmation_of :password
-  validates_length_of :password, :in => 5..25, :allow_blank => true
+  validates_length_of :password, :in => 5..50, :allow_blank => true
   # allow nick to be nil depending on foodcoop config
   # TODO Rails 4 may have a more beautiful way
   #   http://stackoverflow.com/questions/19845910/conditional-allow-nil-part-of-validation
@@ -49,7 +47,7 @@ class User < ApplicationRecord
   after_initialize do
     settings.defaults['profile']  = { 'language' => I18n.default_locale } unless settings.profile
     settings.defaults['messages'] = { 'send_as_email' => true }           unless settings.messages
-    settings.defaults['notify']   = { 'upcoming_tasks' => true  }         unless settings.notify
+    settings.defaults['notify']   = { 'upcoming_tasks' => true } unless settings.notify
   end
 
   before_save do
@@ -63,18 +61,18 @@ class User < ApplicationRecord
     settings_attributes.each do |key, value|
       value.each do |k, v|
         case v
-          when '1'
-            value[k] = true
-          when '0'
-            value[k] = false
+        when '1'
+          value[k] = true
+        when '0'
+          value[k] = false
         end
       end
       self.settings.merge!(key, value)
     end if settings_attributes
 
     if ActiveModel::Type::Boolean.new.cast(create_ordergroup)
-      og = Ordergroup.new({name: name})
-      og.memberships.build({user: self})
+      og = Ordergroup.new({ name: name })
+      og.memberships.build({ user: self })
       og.save!
     end
 
@@ -103,7 +101,7 @@ class User < ApplicationRecord
     match_nick = users[:nick].matches("%#{q}%")
     # or each word matches either first or last name
     match_name = q.split.map do |a|
-        users[:first_name].matches("%#{a}%").or users[:last_name].matches("%#{a}%")
+      users[:first_name].matches("%#{a}%").or users[:last_name].matches("%#{a}%")
     end.reduce(:and)
     User.where(match_nick.or match_name)
   end
@@ -123,7 +121,7 @@ class User < ApplicationRecord
   # Sets the user's password. It will be stored encrypted along with a random salt.
   def set_password
     unless password.blank?
-      salt = [Array.new(6){rand(256).chr}.join].pack("m").chomp
+      salt = [Array.new(6) { rand(256).chr }.join].pack("m").chomp
       self.password_hash, self.password_salt = Digest::SHA1.hexdigest(password + salt), salt
     end
   end
@@ -134,7 +132,7 @@ class User < ApplicationRecord
   end
 
   # Returns a random password.
-  def new_random_password(size = 3)
+  def new_random_password(size = 6)
     c = %w(b c d f g h j k l m n p qu r s t v w x z ch cr fr nd ng nk nt ph pr rd sh sl sp st th tr)
     v = %w(a e i o u y)
     f, r = true, ''
@@ -161,37 +159,37 @@ class User < ApplicationRecord
 
   # Checks the admin role
   def role_admin?
-    groups.detect {|group| group.role_admin?}
+    groups.detect { |group| group.role_admin? }
   end
 
   # Checks the finance role
   def role_finance?
-    FoodsoftConfig[:default_role_finance] || groups.detect {|group| group.role_finance?}
+    FoodsoftConfig[:default_role_finance] || groups.detect { |group| group.role_finance? }
   end
 
   # Checks the invoices role
   def role_invoices?
-    FoodsoftConfig[:default_role_invoices] || groups.detect {|group| group.role_invoices?}
+    FoodsoftConfig[:default_role_invoices] || groups.detect { |group| group.role_invoices? }
   end
 
   # Checks the article_meta role
   def role_article_meta?
-    FoodsoftConfig[:default_role_article_meta] || groups.detect {|group| group.role_article_meta?}
+    FoodsoftConfig[:default_role_article_meta] || groups.detect { |group| group.role_article_meta? }
   end
 
   # Checks the suppliers role
   def role_suppliers?
-    FoodsoftConfig[:default_role_suppliers] || groups.detect {|group| group.role_suppliers?}
+    FoodsoftConfig[:default_role_suppliers] || groups.detect { |group| group.role_suppliers? }
   end
 
   # Checks the invoices role
   def role_pickups?
-    FoodsoftConfig[:default_role_pickups] || groups.detect {|group| group.role_pickups?}
+    FoodsoftConfig[:default_role_pickups] || groups.detect { |group| group.role_pickups? }
   end
 
   # Checks the orders role
   def role_orders?
-    FoodsoftConfig[:default_role_orders] || groups.detect {|group| group.role_orders?}
+    FoodsoftConfig[:default_role_orders] || groups.detect { |group| group.role_orders? }
   end
 
   def ordergroup_name
@@ -203,9 +201,9 @@ class User < ApplicationRecord
     group.users.exists?(self.id)
   end
 
-  #Returns an array with the users groups (but without the Ordergroups -> because tpye=>"")
+  # Returns an array with the users groups (but without the Ordergroups -> because tpye=>"")
   def member_of_groups()
-     self.groups.where(type: '')
+    self.groups.where(type: '')
   end
 
   def deleted?
@@ -232,6 +230,7 @@ class User < ApplicationRecord
   def self.custom_fields
     fields = FoodsoftConfig[:custom_fields] && FoodsoftConfig[:custom_fields][:user]
     return [] unless fields
+
     fields.map(&:deep_symbolize_keys)
   end
 
@@ -249,7 +248,29 @@ class User < ApplicationRecord
   def token_attributes
     # would be sensible to match ApplicationController#show_user
     #   this should not be part of the model anyway
-    {:id => id, :name => "#{display} (#{ordergroup.try(:name)})"}
+    { :id => id, :name => "#{display} (#{ordergroup.try(:name)})" }
   end
 
+  def self.sort_by_param(param)
+    param ||= "name"
+
+    sort_param_map = {
+      "nick" => "nick",
+      "nick_reverse" => "nick DESC",
+      "name" => "first_name, last_name",
+      "name_reverse" => "first_name DESC, last_name DESC",
+      "email" => "users.email",
+      "email_reverse" => "users.email DESC",
+      "phone" => "phone",
+      "phone_reverse" => "phone DESC",
+      "last_activity" => "last_activity",
+      "last_activity_reverse" => "last_activity DESC",
+      "ordergroup" => "IFNULL(groups.type, '') <> 'Ordergroup', groups.name",
+      "ordergroup_reverse" => "IFNULL(groups.type, '') <> 'Ordergroup', groups.name DESC"
+    }
+
+    # Never pass user input data to Arel.sql() because of SQL Injection vulnerabilities.
+    # This case here is okay, as param is mapped to the actual order string.
+    self.eager_load(:groups).order(Arel.sql(sort_param_map[param])) # eager_load is like left_join but without duplicates
+  end
 end

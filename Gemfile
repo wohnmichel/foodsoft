@@ -9,7 +9,6 @@ gem 'uglifier', '>= 1.0.3'
 # See https://github.com/sstephenson/execjs#readme for more supported runtimes
 gem 'therubyracer', platforms: :ruby
 
-
 gem 'jquery-rails'
 gem 'select2-rails'
 gem 'rails_tokeninput'
@@ -28,7 +27,6 @@ gem 'haml-rails'
 gem 'kaminari'
 gem 'simple_form'
 gem 'inherited_resources'
-gem 'localize_input', git: 'https://github.com/carchrae/localize_input.git'
 gem 'daemons'
 gem 'doorkeeper'
 gem 'doorkeeper-i18n'
@@ -43,6 +41,7 @@ gem 'acts_as_tree'
 gem 'rails-settings-cached', '= 0.4.3' # caching breaks tests until Rails 5 https://github.com/huacnlee/rails-settings-cached/issues/73
 gem 'resque'
 gem 'puma'
+gem 'sd_notify'
 gem 'whenever', require: false # For defining cronjobs, see config/schedule.rb
 gem 'ruby-units'
 gem 'attribute_normalizer'
@@ -67,10 +66,9 @@ gem 'foodsoft_links', path: 'plugins/links'
 gem 'foodsoft_polls', path: 'plugins/polls'
 
 # plugins not enabled by default
-#gem 'foodsoft_current_orders', path: 'plugins/current_orders'
-#gem 'foodsoft_printer', path: 'plugins/printer'
-#gem 'foodsoft_uservoice', path: 'plugins/uservoice'
-
+# gem 'foodsoft_current_orders', path: 'plugins/current_orders'
+# gem 'foodsoft_printer', path: 'plugins/printer'
+# gem 'foodsoft_uservoice', path: 'plugins/uservoice'
 
 group :development do
   gem 'sqlite3', '~> 1.3.6'
@@ -87,9 +85,14 @@ group :development do
 
   # Get infos when not using proper eager loading
   gem 'bullet'
+  # Display Active Record queries as tables in the console
+  gem 'table_print'
 end
 
 group :development, :test do
+  gem 'rubocop', require: false
+  gem 'rubocop-rails', require: false
+  gem 'rubocop-rspec', require: false
   gem 'ruby-prof', require: false
 
   # allow to use `debugger` https://github.com/conradirwin/pry-rescue
@@ -111,7 +114,7 @@ group :test do
   gem 'i18n-spec'
   # code coverage
   gem 'simplecov', require: false
-  gem 'coveralls', require: false
+  gem 'simplecov-lcov', require: false
   # api
   gem 'apivore', require: false
   gem 'hashie', '~> 3.4.6', require: false # https://github.com/westfieldlabs/apivore/issues/114

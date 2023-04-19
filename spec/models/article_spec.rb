@@ -5,8 +5,46 @@ describe Article do
   let(:article) { create :article, supplier: supplier }
 
   it 'has a unique name' do
-    article2 = FactoryBot.build :article, supplier: supplier, name: article.name
+    article2 = build :article, supplier: supplier, name: article.name
     expect(article2).to be_invalid
+  end
+
+  it 'can be deleted' do
+    expect(article).not_to be_deleted
+    article.mark_as_deleted
+    expect(article).to be_deleted
+  end
+
+  describe 'convert units' do
+    it 'returns nil when equal' do
+      expect(article.convert_units(article)).to be_nil
+    end
+
+    it 'returns false when invalid unit' do
+      article1 = build :article, supplier: supplier, unit: 'invalid'
+      expect(article.convert_units(article1)).to be false
+    end
+
+    it 'converts from ST to KI (german foodcoops legacy)' do
+      article1 = build :article, supplier: supplier, unit: 'ST'
+      article2 = build :article, supplier: supplier, name: 'banana 10-12 St', price: 12.34, unit: 'KI'
+      new_price, new_unit_quantity = article1.convert_units(article2)
+      expect(new_unit_quantity).to eq 10
+      expect(new_price).to eq 1.23
+    end
+
+    it 'converts from g to kg' do
+      article1 = build :article, supplier: supplier, unit: 'kg'
+      article2 = build :article, supplier: supplier, unit: 'g', price: 0.12, unit_quantity: 1500
+      new_price, new_unit_quantity = article1.convert_units(article2)
+      expect(new_unit_quantity).to eq 1.5
+      expect(new_price).to eq 120
+    end
+  end
+
+  it 'computes changed article attributes' do
+    article2 = build :article, supplier: supplier, name: 'banana'
+    expect(article.unequal_attributes(article2)[:name]).to eq 'banana'
   end
 
   it 'computes the gross price correctly' do
@@ -49,7 +87,6 @@ describe Article do
     expect(article.in_open_order).to eq(order)
   end
 
-
   it 'has no shared article by default' do
     expect(article.shared_article).to be_nil
   end
@@ -72,8 +109,8 @@ describe Article do
     it 'can be synchronised' do
       # TODO move article sync from supplier to article
       article # need to reference for it to exist when syncing
-      updated_article = supplier.sync_all[0].select{|s| s[0].id==article.id}.first[0]
-      article.update_attributes updated_article.attributes.reject{|k,v| k=='id' or k=='type'}
+      updated_article = supplier.sync_all[0].select { |s| s[0].id == article.id }.first[0]
+      article.update(updated_article.attributes.reject { |k, v| k == 'id' or k == 'type' })
       expect(article.name).to eq(shared_article.name)
       # now synchronising shouldn't change anything anymore
       expect(article.shared_article_changed?).to be_falsey
@@ -95,15 +132,15 @@ describe Article do
       article.shared_updated_on -= 1 # to make update do something
       article.save!
       # TODO get sync functionality in article
-      updated_article = supplier.sync_all[0].select{|s| s[0].id==article.id}.first[0]
-      article.update_attributes! updated_article.attributes.reject{|k,v| k=='id' or k=='type'}
+      updated_article = supplier.sync_all[0].select { |s| s[0].id == article.id }.first[0]
+      article.update!(updated_article.attributes.reject { |k, v| k == 'id' or k == 'type' })
       expect(article.unit).to eq '200g'
       expect(article.unit_quantity).to eq 5
-      expect(article.price).to be_within(0.005).of(shared_article.price/5)
+      expect(article.price).to be_within(0.005).of(shared_article.price / 5)
     end
 
     it 'does not synchronise when it has no order number' do
-      article.update_attributes :order_number => nil
+      article.update(order_number: nil)
       expect(supplier.sync_all).to eq [[], [], []]
     end
   end

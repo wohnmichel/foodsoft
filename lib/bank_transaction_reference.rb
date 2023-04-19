@@ -1,8 +1,7 @@
 class BankTransactionReference
-
   # parses a string from a bank transaction field
   def self.parse(data)
-    m = /(^|\s)FS(?<group>\d+)(\.(?<user>\d+))?(?<parts>([A-Za-z]+\d+(\.\d+)?)+)(\s|$)/.match(data)
+    m = /(^|[^\w\.])FS(?<group>\d+)(\.(?<user>\d+))?(?<parts>([A-Za-z]+\d+(\.\d+)?)+)([^\w\.]|$)/.match(data)
     return unless m
 
     parts = {}
@@ -12,8 +11,8 @@ class BankTransactionReference
       parts[category] = value
     end
 
-    ret = { group: m[:group], parts: parts }
-    ret[:user] = m[:user] if m[:user]
+    ret = { group: m[:group].to_i, parts: parts }
+    ret[:user] = m[:user].to_i if m[:user]
     return ret
   end
 
@@ -30,5 +29,4 @@ class BankTransactionReference
       }
     }
   end
-
 end

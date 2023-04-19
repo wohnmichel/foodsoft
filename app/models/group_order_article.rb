@@ -2,18 +2,28 @@
 # The chronologically order of the Ordergroup - activity are stored in GroupOrderArticleQuantity
 #
 class GroupOrderArticle < ApplicationRecord
+  include LocalizeInput
 
   belongs_to :group_order
   belongs_to :order_article
-  has_many   :group_order_article_quantities, :dependent => :destroy
+  has_many   :group_order_article_quantities, dependent: :destroy
 
   validates_presence_of :group_order, :order_article
-  validates_uniqueness_of :order_article_id, :scope => :group_order_id    # just once an article per group order
+  validates_uniqueness_of :order_article_id, :scope => :group_order_id # just once an article per group order
   validate :check_order_not_closed # don't allow changes to closed (aka settled) orders
+  validates :quantity, :tolerance, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
 
   scope :ordered, -> { includes(:group_order => :ordergroup).order('groups.name') }
 
   localize_input_of :result
+
+  def self.ransackable_attributes(auth_object = nil)
+    %w(id quantity tolerance result)
+  end
+
+  def self.ransackable_associations(auth_object = nil)
+    %w(order_article group_order)
+  end
 
   # Setter used in group_order_article#new
   # We have to create an group_order, if the ordergroup wasn't involved in the order yet
@@ -74,10 +84,10 @@ class GroupOrderArticle < ApplicationRecord
       if (quantity > self.quantity || tolerance > self.tolerance)
         logger.debug("Inserting a new GroupOrderArticleQuantity")
         quantities.insert(0, GroupOrderArticleQuantity.new(
-            :group_order_article => self,
-            :quantity => (quantity > self.quantity ? quantity - self.quantity : 0),
-            :tolerance => (tolerance > self.tolerance ? tolerance - self.tolerance : 0)
-        ))
+                               :group_order_article => self,
+                               :quantity => (quantity > self.quantity ? quantity - self.quantity : 0),
+                               :tolerance => (tolerance > self.tolerance ? tolerance - self.tolerance : 0)
+                             ))
         # Recalc totals:
         self.quantity += quantities[0].quantity
         self.tolerance += quantities[0].tolerance
@@ -86,15 +96,15 @@ class GroupOrderArticle < ApplicationRecord
 
     # Check if something went terribly wrong and quantites have not been adjusted as desired.
     if (self.quantity != quantity || self.tolerance != tolerance)
-      raise 'Invalid state: unable to update GroupOrderArticle/-Quantities to desired quantities!'
+      raise ActiveRecord::RecordNotSaved.new('Unable to update GroupOrderArticle/-Quantities to desired quantities!', self)
     end
 
     # Remove zero-only items.
-    quantities = quantities.reject { | q | q.quantity == 0 && q.tolerance == 0}
+    quantities = quantities.reject { |q| q.quantity == 0 && q.tolerance == 0 }
 
     # Save
     transaction do
-      quantities.each { | i | i.save! }
+      quantities.each { |i| i.save! }
       self.group_order_article_quantities = quantities
       save!
     end
@@ -128,15 +138,18 @@ class GroupOrderArticle < ApplicationRecord
       order_quantities = GroupOrderArticleQuantity.where(group_order_article_id: order_article.group_order_article_ids).order('created_on')
       logger.debug "GroupOrderArticleQuantity records found: #{order_quantities.size}"
 
+      first_order_first_serve = (FoodsoftConfig[:distribution_strategy] == FoodsoftConfig::DistributionStrategy::FIRST_ORDER_FIRST_SERVE)
+
       # Determine quantities to be ordered...
       order_quantities.each do |goaq|
-        q = [goaq.quantity, total - total_quantity].min
+        q = goaq.quantity
+        q = [q, total - total_quantity].min if first_order_first_serve
         total_quantity += q
         if goaq.group_order_article_id == self.id
           logger.debug "increasing quantity by #{q}"
           quantity += q
         end
-        break if total_quantity >= total
+        break if total_quantity >= total && first_order_first_serve
       end
 
       # Determine tolerance to be ordered...
@@ -157,7 +170,7 @@ class GroupOrderArticle < ApplicationRecord
     end
 
     # memoize result unless a total is given
-    r = {:quantity => quantity, :tolerance => tolerance, :total => quantity + tolerance}
+    r = { :quantity => quantity, :tolerance => tolerance, :total => quantity + tolerance }
     @calculate_result = r if total.nil?
     r
   end

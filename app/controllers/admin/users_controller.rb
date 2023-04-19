@@ -3,12 +3,18 @@ class Admin::UsersController < Admin::BaseController
 
   def index
     @users = params[:show_deleted] ? User.deleted : User.undeleted
+    @users = @users.sort_by_param(params["sort"])
+
     @users = @users.includes(:mail_delivery_status)
+
+    if request.format.csv?
+      send_data UsersCsv.new(@users).to_csv, filename: 'users.csv', type: 'text/csv'
+    end
 
     # if somebody uses the search field:
     @users = @users.natural_search(params[:user_name]) unless params[:user_name].blank?
 
-    @users = @users.natural_order.page(params[:page]).per(@per_page)
+    @users = @users.page(params[:page]).per(@per_page)
   end
 
   def destroy

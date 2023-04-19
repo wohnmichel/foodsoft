@@ -5,7 +5,15 @@ class Finance::InvoicesController < ApplicationController
   before_action :ensure_can_edit, only: [:edit, :update, :destroy]
 
   def index
-    @invoices = Invoice.includes(:supplier, :deliveries, :orders).order('date DESC').page(params[:page]).per(@per_page)
+    @invoices_all = Invoice.includes(:supplier, :deliveries, :orders).order('date DESC')
+    @invoices = @invoices_all.page(params[:page]).per(@per_page)
+
+    respond_to do |format|
+      format.js; format.html { render }
+      format.csv do
+        send_data InvoicesCsv.new(@invoices_all).to_csv, filename: 'invoices.csv', type: 'text/csv'
+      end
+    end
   end
 
   def unpaid
@@ -32,8 +40,8 @@ class Finance::InvoicesController < ApplicationController
   end
 
   def fill_deliveries_and_orders_collection(invoice_id, supplier_id)
-    @deliveries_collection = Delivery.where('invoice_id = ? OR (invoice_id IS NULL AND supplier_id = ?)', invoice_id, supplier_id).order(:date)
-    @orders_collection = Order.where('invoice_id = ? OR (invoice_id IS NULL AND supplier_id = ? AND state = ?)', invoice_id, supplier_id, 'finished').order(:ends)
+    @deliveries_collection = Delivery.where('invoice_id = ? OR (invoice_id IS NULL AND supplier_id = ?)', invoice_id, supplier_id).order(date: :desc).limit(25)
+    @orders_collection = Order.where('invoice_id = ? OR (invoice_id IS NULL AND supplier_id = ?)', invoice_id, supplier_id).order(ends: :desc).limit(25)
   end
 
   def create
@@ -55,7 +63,7 @@ class Finance::InvoicesController < ApplicationController
   end
 
   def update
-    if @invoice.update_attributes(params[:invoice])
+    if @invoice.update(params[:invoice])
       redirect_to [:finance, @invoice], notice: I18n.t('finance.update.notice')
     else
       fill_deliveries_and_orders_collection @invoice.id, @invoice.supplier_id

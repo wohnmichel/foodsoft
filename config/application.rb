@@ -29,12 +29,15 @@ module Foodsoft
 
     # Internationalization.
     config.i18n.load_path += Dir[Rails.root.join('config', 'locales', '*.yml')]
-    config.i18n.available_locales = Pathname.glob(Rails.root.join('config', 'locales', '{??,???}{-*,}.yml')).map{|p| p.basename('.yml').to_s }
+    config.i18n.available_locales = Pathname.glob(Rails.root.join('config', 'locales', '{??,???}{-*,}.yml')).map { |p| p.basename('.yml').to_s }
     config.i18n.default_locale = :en
     config.i18n.fallbacks = [:en]
 
     # Configure the default encoding used in templates for Ruby 1.9.
     config.encoding = "utf-8"
+
+    # TODO: Remove this. See CVE-2022-32224 for details.
+    config.active_record.yaml_column_permitted_classes = [BigDecimal, Date, Symbol, Time]
 
     # Enable escaping HTML in JSON.
     config.active_support.escape_html_entities_in_json = true
@@ -47,6 +50,9 @@ module Foodsoft
     # TODO Disable this. Uncommenting this line will currently cause rspec to fail.
     config.action_controller.permit_all_parameters = true
 
+    config.active_job.queue_adapter     = :resque
+    config.active_job.queue_name_prefix = ENV.fetch('JOB_QUEUE_PREFIX', "foodsoft_#{Rails.env}")
+
     # Enable the asset pipeline
     config.assets.enabled = true
 
@@ -58,7 +64,7 @@ module Foodsoft
     config.assets.initialize_on_precompile = true
 
     # Load legacy scripts from vendor
-    config.assets.precompile += [ 'vendor/assets/javascripts/*.js' ]
+    config.assets.precompile += ['vendor/assets/javascripts/*.js']
 
     # CORS for API
     config.middleware.insert_before 0, Rack::Cors do
@@ -71,7 +77,7 @@ module Foodsoft
   end
 
   # Foodsoft version
-  VERSION = File.read(Rails.root.join('VERSION')).strip
+  VERSION = Rails.root.join('VERSION').read.strip
   # Current revision, or +nil+
-  REVISION = (File.read(Rails.root.join('REVISION')).strip rescue nil)
+  REVISION = (Rails.root.join('REVISION').read.strip rescue nil)
 end

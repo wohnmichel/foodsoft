@@ -10,9 +10,9 @@ require 'capybara/apparition'
 Capybara.server = :puma, { Silent: true }
 Capybara.javascript_driver = :apparition
 
-#TODO: Remove temporary fix to ignore JavaScript errors
+# TODO: Remove temporary fix to ignore JavaScript errors
 Capybara.register_driver :apparition do |app|
-  Capybara::Apparition::Driver.new(app, {js_errors: false})
+  Capybara::Apparition::Driver.new(app, { js_errors: false })
 end
 
 # Requires supporting ruby files with custom matchers and macros, etc,
@@ -51,17 +51,26 @@ RSpec.configure do |config|
   #     --seed 1234
   config.order = "random"
 
+  config.include SpecTestHelper, type: :controller
   config.include SessionHelper, type: :feature
-
   # Automatically determine spec from directory structure, see:
   # https://www.relishapp.com/rspec/rspec-rails/v/3-0/docs/directory-structure
   config.infer_spec_type_from_file_location!
 end
 
+if ENV['COVERAGE'] == 'lcov'
+  require 'simplecov-lcov'
+  SimpleCov::Formatter::LcovFormatter.config do |c|
+    c.report_with_single_file = true
+    c.single_report_path = 'coverage/lcov.info'
+  end
+  SimpleCov.formatters = SimpleCov::Formatter::LcovFormatter
+end
+
 # include default foodsoft scope in urls, so that *_path works
 # https://github.com/rspec/rspec-rails/issues/255
 class ActionDispatch::Routing::RouteSet
-  def default_url_options(options={})
-      {foodcoop: FoodsoftConfig.scope}.merge(options)
+  def default_url_options(options = {})
+    { foodcoop: FoodsoftConfig.scope }.merge(options)
   end
 end
