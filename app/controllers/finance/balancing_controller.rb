@@ -13,7 +13,7 @@ class Finance::BalancingController < Finance::BaseController
       :article_price,
       group_order_articles: { group_order: :ordergroup }
     )
-                                       
+
     sort_param = params['sort'] || 'order_number'
     @articles = case sort_param
                 when 'name' then
