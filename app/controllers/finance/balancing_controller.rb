@@ -11,7 +11,7 @@ class Finance::BalancingController < Finance::BaseController
     @articles = @order.order_articles.ordered_or_member.includes(:article, :article_price,
                                                                  group_order_articles: { group_order: :ordergroup })
 
-    sort_param = params['sort'] || 'name'
+    sort_param = params['sort'] || 'order_number'
     @articles = case sort_param
                 when 'name'
                   @articles.order('articles.name ASC')
