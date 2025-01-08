@@ -15,7 +15,6 @@ class OrderByGroups < OrderPdf
       rows = [[
         OrderArticle.human_attribute_name(:article),
         Article.human_attribute_name(:supplier),
-        GroupOrderArticle.human_attribute_name(:ordered),
         GroupOrderArticle.human_attribute_name(:received),
         GroupOrderArticle.human_attribute_name(:unit_price),
         GroupOrderArticle.human_attribute_name(:total_price)
@@ -25,7 +24,6 @@ class OrderByGroups < OrderPdf
         dimrows << rows.length if goa.result == 0
         rows << [goa.order_article.article.name,
                  goa.group_order.order.name,
-                 group_order_article_quantity_with_tolerance(goa),
                  group_order_article_result(goa),
                  order_article_price_per_unit(goa.order_article),
                  number_to_currency(goa.total_price)]
@@ -58,7 +56,7 @@ class OrderByGroups < OrderPdf
         end
 
         table.columns(-4..-1).align = :right
-        table.column(-3).font_style = :bold
+        table.column(-4).font_style = :bold
         table.column(-1).font_style = :bold
       end
     end
