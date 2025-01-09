@@ -1,3 +1,15 @@
+# [Foodsoft 4.9.3](https://github.com/foodcoops/foodsoft/compare/v4.9.2...v4.9.3) 
+(2025-01-09)
+
+Inofficial release with customizations:
+
+* [Highlight available tolerances](https://github.com/wohnmichel/foodsoft/commit/db7ebf57fc617ebd12a52b0a6b1a39f087821a3b)
+* [Increase PMA upload limit for dumps](https://github.com/wohnmichel/foodsoft/commit/faaad5baa2b275f094c33180768a214747598287)
+* [Order CSV: Sort articles by orderNumber](https://github.com/wohnmichel/foodsoft/commit/358b0f150f70b7ef94d562f69b7c83111cbbe4a0)
+* [Add tags for Docker push](https://github.com/wohnmichel/foodsoft/commit/c17eebe159af99bd9d514c3819fefa1dbac5a653)
+* [Push to Docker Hub](https://github.com/wohnmichel/foodsoft/commit/ad1bcb5c4295148f71048842c63b26ff4c5e2ae5)
+
+
 # [Foodsoft 4.9.2](https://github.com/foodcoops/foodsoft/compare/v4.9...v4.9.2) 
 (2025-01-09)
 
