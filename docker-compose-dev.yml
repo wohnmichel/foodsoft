@@ -43,6 +43,7 @@ services:
       - PMA_HOST=mariadb
       - PMA_USER=root
       - PMA_PASSWORD=secret
+      - UPLOAD_LIMIT=50M
     ports:
       - "2080:80"
 
