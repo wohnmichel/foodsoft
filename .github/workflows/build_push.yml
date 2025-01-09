@@ -5,6 +5,8 @@ on:
     inputs:
       commit_sha:
         required: true
+      tag:
+        required: true
 env:
   REGISTRY: docker.io
   IMAGE_NAME: wohnmichel/foodsoft
@@ -35,6 +37,9 @@ jobs:
         with:
           images: |
             ${{ env.IMAGE_NAME }}
+          tags: |
+            latest
+            ${{ github.event.inputs.tag }}
 
       - name: Build and push Docker images
         id: push
