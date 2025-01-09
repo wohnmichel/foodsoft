@@ -1,3 +1,15 @@
+# [Foodsoft 4.9.2](https://github.com/foodcoops/foodsoft/compare/v4.9...v4.9.2) 
+(2025-01-09)
+
+Inofficial release with customizations:
+
+* [Order PDFs: Hide ordered column to avoid confusion](https://github.com/wohnmichel/foodsoft/commit/977c12c923d590a82fd1f928ac21acb6ee5742ff)
+* [Export availability to article CSVs](https://github.com/wohnmichel/foodsoft/commit/d1d0d10b183427a54e220a467779c7da11b598cd)
+* [Sort articles by orderNumber by default](https://github.com/wohnmichel/foodsoft/commit/d105e4f851415d9e8faefb2c974e3224eeaf73b4)
+* [Sort order groups by name](https://github.com/wohnmichel/foodsoft/commit/837884aac0e641414da164992c3f6400d99ff88f)
+* [Visual customization for WohnMichel](https://github.com/wohnmichel/foodsoft/commit/e58c148bf1041da514bd3eca50f824430fbf6570)
+
+
 # [Foodsoft 4.9](https://github.com/foodcoops/foodsoft/compare/v4.8.1-rc2...v4.9) 
 (2024-07-10)
 
