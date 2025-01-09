@@ -130,10 +130,16 @@ function update(item, quantity, tolerance) {
     // update missing units
     var missing_units = calcMissingItems(unit[item], quantityOthers[item] + Number(quantity), toleranceOthers[item] + Number(tolerance)),
         missing_units_css = '';
+    
+    var availableTolerance = missing_units > 0
+        ? 0
+        : calcAvailableTolerance(unit[item], quantityOthers[item] + Number(quantity) + Number(tolerance));
 
     if (missing_units <= 0 || missing_units == unit[item]) {
         missing_units = 0;
-        if (units > 0) {
+        if (availableTolerance > 0) {
+            missing_units_css = 'available-few';
+        } else if (units > 0) {
             missing_units_css = 'missing-none';
         } else {
             missing_units_css = '';
@@ -146,7 +152,7 @@ function update(item, quantity, tolerance) {
     $('#missing_units_' + item)
         .html(String(missing_units))
         .closest('tr')
-        .removeClass('missing-many missing-few missing-none')
+        .removeClass('available-few missing-many missing-few missing-none')
         .addClass(missing_units_css);
 
     updateBalance();
@@ -162,6 +168,11 @@ function calcUnits(unitSize, quantity, tolerance) {
 function calcMissingItems(unitSize, quantity, tolerance) {
     var remainder = quantity % unitSize
     return remainder > 0 && remainder + tolerance < unitSize ? unitSize - remainder - tolerance : 0
+}
+
+function calcAvailableTolerance(unitSize, quantity) {
+    var remainder = quantity % unitSize
+    return remainder > 0 ? unitSize - remainder : 0
 }
 
 function unitCompletedFromTolerance(unitSize, quantity, tolerance) {

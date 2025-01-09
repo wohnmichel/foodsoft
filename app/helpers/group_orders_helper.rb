@@ -45,10 +45,12 @@ module GroupOrdersHelper
     { group_order_article: goa, quantity: quantity, tolerance: tolerance, result: result, sub_total: sub_total }
   end
 
-  def get_missing_units_css_class(quantity_missing)
+  def get_missing_units_css_class(quantity_missing, quantity_tolerance)
     if quantity_missing == 1
       'missing-few'
-    elsif quantity_missing == 0
+    elsif quantity_missing == 0 && quantity_tolerance > 0
+      'available-few'
+    elsif quantity_missing == 0 && quantity_tolerance == 0
       ''
     else
       'missing-many'

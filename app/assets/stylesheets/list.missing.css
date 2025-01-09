@@ -6,6 +6,10 @@
 	background-color: #ffee75;
 }
 
+.list .available-few td, .list .available-few:hover td {
+	background-color: #7fd5eb;
+}
+
 .list .missing-none td, .list .missing-none:hover td {
 	background-color: #E4EED6;
 }
