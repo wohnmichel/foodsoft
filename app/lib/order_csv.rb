@@ -3,8 +3,9 @@ require 'csv'
 class OrderCsv < RenderCsv
   def header
     [
-      OrderArticle.human_attribute_name(:units_to_order),
-      Article.human_attribute_name(:order_number),
+      'artnr',
+      'menge',
+      'kommentar',
       Article.human_attribute_name(:name),
       Article.human_attribute_name(:unit),
       Article.human_attribute_name(:unit_quantity_short),
@@ -16,8 +17,9 @@ class OrderCsv < RenderCsv
   def data
     @object.order_articles.ordered.includes(%i[article article_price]).order('article.order_number').all.map do |oa|
       yield [
-        oa.units_to_order,
         oa.article.order_number,
+        oa.units_to_order,
+        '',
         oa.article.name,
         oa.article.unit,
         oa.price.unit_quantity > 1 ? oa.price.unit_quantity : nil,
