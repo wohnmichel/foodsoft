@@ -1,4 +1,12 @@
-# [Foodsoft 4.9.3](https://github.com/foodcoops/foodsoft/compare/v4.9.2...v4.9.3) 
+# [Foodsoft 4.9.4](https://github.com/wohnmichel/foodsoft/compare/v4.9.3...v4.9.4) 
+(2025-01-09)
+
+Inofficial release with customizations:
+
+* [Use Terra CSV format](https://github.com/wohnmichel/foodsoft/commit/93afe216ee99cec68fd1ca5273acf7ffd6997c36)
+
+
+# [Foodsoft 4.9.3](https://github.com/wohnmichel/foodsoft/compare/v4.9.2...v4.9.3) 
 (2025-01-09)
 
 Inofficial release with customizations:
@@ -10,7 +18,7 @@ Inofficial release with customizations:
 * [Push to Docker Hub](https://github.com/wohnmichel/foodsoft/commit/ad1bcb5c4295148f71048842c63b26ff4c5e2ae5)
 
 
-# [Foodsoft 4.9.2](https://github.com/foodcoops/foodsoft/compare/v4.9...v4.9.2) 
+# [Foodsoft 4.9.2](https://github.com/wohnmichel/foodsoft/compare/v4.9...v4.9.2) 
 (2025-01-09)
 
 Inofficial release with customizations:
